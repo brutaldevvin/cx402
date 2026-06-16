@@ -1,4 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts'
@@ -32,6 +34,9 @@ interface Deps {
   facilitatorLabel: string
   /** optional UI page path served at `/` (re-read per request for live iteration) */
   uiHtmlPath?: string
+  skillMdPath?: string
+  llmsTxtPath?: string
+  openapiJsonPath?: string
 }
 
 /**
@@ -100,6 +105,28 @@ export function createApp(d: Deps): Hono {
     return c.json(info())
   })
   app.get('/info', (c) => c.json(info()))
+  const staticText = (filePath: string | undefined, contentType: string) => {
+    if (!filePath || !existsSync(filePath)) return null
+    return { body: readFileSync(filePath, 'utf8'), contentType }
+  }
+  app.get('/skill.md', (c) => {
+    const f = staticText(d.skillMdPath, 'text/markdown; charset=utf-8')
+    if (!f) return c.json({ error: 'not_found' }, 404)
+    c.header('content-type', f.contentType)
+    return c.body(f.body)
+  })
+  app.get('/llms.txt', (c) => {
+    const f = staticText(d.llmsTxtPath, 'text/plain; charset=utf-8')
+    if (!f) return c.json({ error: 'not_found' }, 404)
+    c.header('content-type', f.contentType)
+    return c.body(f.body)
+  })
+  app.get('/openapi.json', (c) => {
+    const f = staticText(d.openapiJsonPath, 'application/json; charset=utf-8')
+    if (!f) return c.json({ error: 'not_found' }, 404)
+    c.header('content-type', f.contentType)
+    return c.body(f.body)
+  })
 
   // read-only liveness probe: proves the demo is wired to real infra. never throws.
   app.get('/health', async (c) => {
@@ -414,7 +441,8 @@ export function createApp(d: Deps): Hono {
 }
 
 /** Wire everything from config. Used by the server entry and by tests. */
-export function createFacilitator(cfg: FacilitatorConfig, opts: { uiHtmlPath?: string } = {}) {
+export function createFacilitator(cfg: FacilitatorConfig, opts: { uiHtmlPath?: string; skillMdPath?: string; llmsTxtPath?: string; openapiJsonPath?: string } = {}) {
+  const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
   const cv = new CleanverseClient(cfg.cleanverse)
   const engine = new ComplianceEngine(cv, cfg.chain, cfg.complianceAsset)
   const bus = new EventBus()
@@ -441,6 +469,12 @@ export function createFacilitator(cfg: FacilitatorConfig, opts: { uiHtmlPath?: s
     if (cfg.facilitatorPkey) signer = privateKeyToAccount(cfg.facilitatorPkey)
   }
 
-  const app = createApp({ cv, engine, settler, store, bus, policyEngine, mandateVerifier, cfg, signer, facilitatorLabel, uiHtmlPath: opts.uiHtmlPath })
+  const app = createApp({
+    cv, engine, settler, store, bus, policyEngine, mandateVerifier, cfg, signer, facilitatorLabel,
+    uiHtmlPath: opts.uiHtmlPath,
+    skillMdPath: opts.skillMdPath ?? join(repoRoot, 'skills', 'cx402', 'SKILL.md'),
+    llmsTxtPath: opts.llmsTxtPath ?? join(repoRoot, 'llms.txt'),
+    openapiJsonPath: opts.openapiJsonPath ?? join(repoRoot, 'openapi.json'),
+  })
   return { app, bus, store, settler, cv, policyEngine, mandateVerifier, facilitatorLabel }
 }

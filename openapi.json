@@ -1,0 +1,340 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "cx402 Facilitator API",
+    "version": "0.1.0",
+    "description": "Compliance-gated x402-style agent payments with Cleanverse A-Pass checks, signed mandates, signed payment intents, Monad aUSDC settlement, receipts, and Travel Rule report links."
+  },
+  "servers": [
+    {
+      "url": "https://cx402.up.railway.app"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Live Infrastructure Check",
+        "responses": {
+          "200": {
+            "description": "Live infrastructure status",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ok": {
+                    "value": {
+                      "status": "ok",
+                      "network": "eip155:10143",
+                      "settlementMode": "onchain-transferFrom",
+                      "checks": {
+                        "cleanverseReachable": true,
+                        "monadRpcReachable": true,
+                        "payerApass": {
+                          "verified": true,
+                          "code": 4
+                        },
+                        "payeeApass": {
+                          "verified": true,
+                          "code": 4
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/supported": {
+      "get": {
+        "summary": "Supported x402 payment requirements",
+        "responses": {
+          "200": {
+            "description": "Accepted payment kind list",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "supported": {
+                    "value": {
+                      "kinds": [
+                        {
+                          "scheme": "exact",
+                          "network": "eip155:10143",
+                          "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                          "extra": {
+                            "compliance": "a-pass"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/premium": {
+      "get": {
+        "summary": "Protected Agent API",
+        "description": "Without payment this seller route returns a 402 Payment Required challenge. With a valid compliant payment it serves the resource with a receipt.",
+        "responses": {
+          "200": {
+            "description": "Protected resource served after verified payment"
+          },
+          "402": {
+            "description": "x402 payment challenge",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "challenge": {
+                    "value": {
+                      "x402Version": 1,
+                      "accepts": [
+                        {
+                          "scheme": "exact",
+                          "network": "eip155:10143",
+                          "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                          "payTo": "0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB",
+                          "maxAmountRequired": "1000",
+                          "resource": "/premium",
+                          "description": "cx402 premium market-data feed"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "summary": "Verify identity and policy without settlement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "examples": {
+                "verify": {
+                  "value": {
+                    "payment": {
+                      "scheme": "exact",
+                      "network": "eip155:10143",
+                      "payer": "0x03681955065AF6EA51660dd63e7634fd0dE4d0a8",
+                      "payee": "0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB",
+                      "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                      "amount": "1000"
+                    },
+                    "requirements": {
+                      "scheme": "exact",
+                      "network": "eip155:10143",
+                      "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                      "payTo": "0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB",
+                      "maxAmountRequired": "1000",
+                      "resource": "/premium"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compliance decision",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "cleared": {
+                    "value": {
+                      "isValid": true,
+                      "compliance": {
+                        "decision": "CLEARED"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settle": {
+      "post": {
+        "summary": "Verify, settle, and issue receipt",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "examples": {
+                "settle": {
+                  "value": {
+                    "payment": {
+                      "scheme": "exact",
+                      "network": "eip155:10143",
+                      "payer": "0x03681955065AF6EA51660dd63e7634fd0dE4d0a8",
+                      "payee": "0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB",
+                      "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                      "amount": "1000"
+                    },
+                    "requirements": {
+                      "scheme": "exact",
+                      "network": "eip155:10143",
+                      "asset": "0xaC0893567D43C3E7e6e35a72803df05416C1f20D",
+                      "payTo": "0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB",
+                      "maxAmountRequired": "1000",
+                      "resource": "/premium"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settled payment with signed receipt"
+          },
+          "402": {
+            "description": "Blocked before settlement"
+          }
+        }
+      }
+    },
+    "/policy": {
+      "post": {
+        "summary": "Register signed or demo policy mandate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "examples": {
+                "demoPolicy": {
+                  "value": {
+                    "agent": "0x03681955065AF6EA51660dd63e7634fd0dE4d0a8",
+                    "policy": {
+                      "budget": "4000",
+                      "maxPerTx": "2000",
+                      "minTier": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Policy registered",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ok": {
+                    "value": {
+                      "ok": true,
+                      "signed": false,
+                      "spent": "0"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unsigned policy disabled or invalid signature"
+          }
+        }
+      }
+    },
+    "/proof/mandate": {
+      "get": {
+        "summary": "Signed Agent Mandate proof",
+        "responses": {
+          "200": {
+            "description": "Accepts valid mandate and rejects forged, expired, tampered, or replayed mandates"
+          }
+        }
+      }
+    },
+    "/proof/payment-intent": {
+      "get": {
+        "summary": "Signed Payment Intent proof",
+        "responses": {
+          "200": {
+            "description": "Accepts valid intent and rejects tampered payee, amount, resource, expiry, or nonce"
+          }
+        }
+      }
+    },
+    "/report": {
+      "get": {
+        "summary": "Cleanverse Audit Report",
+        "parameters": [
+          {
+            "name": "tx",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "w",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Report is still being generated"
+          },
+          "302": {
+            "description": "Redirects to official Cleanverse Travel Rule report"
+          },
+          "400": {
+            "description": "Missing tx or wallet query"
+          }
+        }
+      }
+    },
+    "/skill.md": {
+      "get": {
+        "summary": "Agent-readable cx402 skill",
+        "responses": {
+          "200": {
+            "description": "Markdown skill instructions"
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "summary": "LLM discovery text",
+        "responses": {
+          "200": {
+            "description": "Plain text LLM guide"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "OpenAPI schema",
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 JSON document"
+          }
+        }
+      }
+    }
+  }
+}

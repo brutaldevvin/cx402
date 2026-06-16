@@ -1,0 +1,23 @@
+# cx402
+
+cx402 is the compliance layer for x402-style AI agent payments.
+
+Base URL: https://cx402.up.railway.app
+
+Read first:
+- /health
+- /supported
+- /premium
+- /proof/mandate
+- /proof/payment-intent
+- /skill.md
+- /openapi.json
+
+Core behavior:
+- AI agents can attempt payments.
+- cx402 checks Cleanverse A-Pass identity for payer and payee.
+- cx402 enforces mandate policy: budget, max per payment, min tier, allow-list.
+- cx402 verifies signed mandate and signed payment-intent proofs.
+- Cleared payments settle real Cleanverse aUSDC on Monad.
+- Blocked payments do not settle.
+- Cleared payments produce signed receipts and Cleanverse Travel Rule report links.

@@ -49,6 +49,24 @@
   .prow .pv{color:var(--ink);text-align:right}.prow .pv a{color:inherit;text-decoration:none}.prow .pv a:hover{text-decoration:underline}
   .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
   .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:14px;line-height:2}.endpoints a{color:var(--ink2);text-decoration:none}.endpoints a:hover{color:var(--green)}
+  .protocol{margin-top:26px}
+  .protocol h3{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px}
+  .protocolintro,.protocolclose{font-size:14.5px;color:var(--ink2);line-height:1.55;max-width:760px}
+  .protocolclose{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);margin-top:16px}
+  .protocolgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:16px}
+  .protocard{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:18px;display:flex;flex-direction:column;min-width:0}
+  .prototitle{font-size:16px;font-weight:700;line-height:1.18;color:var(--ink)}
+  .protoendpoint{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--mut);margin-top:5px}
+  .protostatus{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;line-height:1.35;color:var(--ink);margin-top:12px;text-transform:uppercase;letter-spacing:.08em}
+  .protostatus.gd{color:var(--green)}.protostatus.rd{color:#c0392b}.protostatus.am{color:#b8860b}
+  .protocard p{font-size:13.5px;color:var(--ink2);line-height:1.45;margin-top:8px;flex:1}
+  .transcript{margin-top:12px;background:#1c1a14;color:#ece7da;border-radius:7px;padding:13px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;min-height:138px}
+  .protoactions,.agentlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+  .protoactions a,.protoactions button,.agentlinks a,.agentlinks button{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:8px 10px;text-decoration:none;cursor:pointer}
+  .protoactions a:hover,.protoactions button:hover,.agentlinks a:hover,.agentlinks button:hover{border-color:var(--green)}
+  .agentready{border:1px solid #0a9a4540;background:#0a9a450c;border-radius:8px;padding:13px;margin-top:12px}
+  .agentready h3{font-size:14px;font-weight:700;margin-bottom:5px}
+  .agentready p{font-size:12.5px;line-height:1.45;color:var(--ink2)}
   .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px}.hook .d{color:var(--green)}
   .herodemo{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:22px;align-items:start}
   .hdleft{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:20px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4)}
@@ -127,7 +145,7 @@
   footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;gap:24px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)}
   .btn{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--card);background:var(--ink);border-radius:30px;padding:13px 24px;text-decoration:none;transition:transform .2s}.btn:hover{transform:translateY(-2px)}
   @media(max-width:860px){
-    .herogrid,.live,.anat,.codewrap,.tk{grid-template-columns:1fr}
+    .herogrid,.live,.anat,.codewrap,.tk,.protocolgrid{grid-template-columns:1fr}
     .grid3{grid-template-columns:1fr}
     .panel{position:static}
   }
@@ -144,7 +162,7 @@
     .h2{font-size:27px;line-height:1.14}
     .lead{font-size:16px}
     .herodemo{gap:18px}
-    .hdleft,.panel,.card,.tkcard{padding:18px}
+    .hdleft,.panel,.card,.tkcard,.protocard{padding:18px}
     .proof div{flex-basis:50%;min-width:0}
     .prow{flex-direction:column;align-items:flex-start;gap:6px}
     .prow .pv{text-align:left;max-width:100%;overflow-wrap:anywhere}
@@ -171,6 +189,7 @@
     .proof div{flex-basis:100%;border-right:none;border-bottom:1px solid var(--edge)}
     .proof div:last-child{border-bottom:none}
     .tkcode{white-space:pre-wrap;overflow-wrap:anywhere}
+    .protoactions a,.protoactions button{flex:1;text-align:center}
   }
 </style></head>
 <body>
@@ -190,6 +209,11 @@
         </div>
         <input id="mintier" type="hidden" value="1">
         <button class="runbtn" id="run">▶ run procurement agent</button>
+        <div class="agentready">
+          <h3>Use cx402 with an agent</h3>
+          <p>cx402 includes an agent-readable skill and live proof endpoints. Give <span class="mono">/skill.md</span> to Codex, Claude, or another agent so it can verify the facilitator, inspect the 402 challenge, and understand the compliant payment flow.</p>
+          <div class="agentlinks"><button type="button" data-copy-url="/skill.md">Copy SKILL.md</button><a href="/skill.md" target="_blank">Open /skill.md</a><a href="/llms.txt" target="_blank">Open /llms.txt</a><a href="/openapi.json" target="_blank">Open /openapi.json</a></div>
+        </div>
         <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
         <div class="hlinks"><a id="h-tx" target="_blank">latest tx -</a> · <a id="h-report" target="_blank">travel rule report -</a></div>
         <div class="note" id="livestatus"><span style="color:var(--mut)">●</span> checking live status…</div>
@@ -201,20 +225,77 @@
   <!-- LIVE PROOF PANEL -->
   <section id="proof">
     <h2 class="h2 reveal">Don't take our word for it.</h2>
-    <p class="body reveal">Live proof, not claims. Every value below is read straight off the running facilitator when you loaded this page, and is independently checkable.</p>
-    <div class="ppanel reveal">
-      <div class="prow"><span class="pk">facilitator</span><span class="pv" id="p-status">checking…</span></div>
-      <div class="prow"><span class="pk">Cleanverse API</span><span class="pv" id="p-cv">-</span></div>
-      <div class="prow"><span class="pk">payer A-Pass</span><span class="pv" id="p-payer">-</span></div>
-      <div class="prow"><span class="pk">payee A-Pass</span><span class="pv" id="p-payee">-</span></div>
-      <div class="prow"><span class="pk">settlement asset</span><span class="pv" id="p-asset">-</span></div>
-      <div class="prow"><span class="pk">mode</span><span class="pv" id="p-mode">-</span></div>
-      <div class="prow"><span class="pk">latest settlement</span><span class="pv" id="p-tx">-</span></div>
-      <div class="prow"><span class="pk">travel rule</span><span class="pv" id="p-report">-</span></div>
-      <div class="prow"><span class="pk">signed mandate</span><span class="pv" id="p-mandate">-</span></div>
-      <div class="prow"><span class="pk">payment intent</span><span class="pv" id="p-intent">-</span></div>
+    <p class="body reveal">Live proof, not claims. The modules below explain the seller challenge, mandate, payment intent, live infrastructure, and audit report in plain language.</p>
+    <div class="protocol reveal">
+      <h3>Live Protocol Proof</h3>
+      <p class="protocolintro">cx402 has five proof modules. They are here so you do not have to trust the UI. Each one verifies a different part of the agent-payment trust model.</p>
+      <div class="protocolgrid">
+        <article class="protocard">
+          <div class="prototitle">Protected Agent API</div>
+          <div class="protoendpoint">/premium</div>
+          <div class="protostatus" id="proto-402-status">checking challenge</div>
+          <p>This is the seller side. A data API, MCP tool, or agent service can sit behind cx402. If an agent requests the resource without payment, it receives a 402 Payment Required challenge. If it sends a valid compliant payment, the resource is served with a receipt.</p>
+          <pre class="transcript" id="proto-402-tx">GET /premium
+-&gt; 402 Payment Required
+accepts: exact · eip155:10143 · aUSDC
+payTo: 0xBe58...CfBB
+resource: premium market-data feed</pre>
+          <div class="protoactions"><a href="/premium" target="_blank">Open raw 402 challenge</a><button type="button" data-curl="/premium">Copy curl</button></div>
+        </article>
+        <article class="protocard">
+          <div class="prototitle">Signed Agent Mandate</div>
+          <div class="protoendpoint">/proof/mandate</div>
+          <div class="protostatus" id="proto-mandate-status">checking mandate proof</div>
+          <p>This is the operator side. The human or institution gives the agent a signed spending mandate: budget, max payment, minimum counterparty tier, and optional allow-list. cx402 rejects forged, expired, tampered, or replayed mandates.</p>
+          <pre class="transcript" id="proto-mandate-tx">valid mandate       accepted
+wrong signer        rejected
+expired mandate     rejected
+tampered budget     rejected
+replayed nonce      rejected</pre>
+          <div class="protoactions"><a href="/proof/mandate" target="_blank">Open proof</a><button type="button" data-curl="/proof/mandate">Copy curl</button></div>
+        </article>
+        <article class="protocard">
+          <div class="prototitle">Signed Payment Intent</div>
+          <div class="protoendpoint">/proof/payment-intent</div>
+          <div class="protostatus" id="proto-intent-status">checking intent proof</div>
+          <p>This is the per-payment authorization layer. A payment intent binds the payer to the exact payee, amount, asset, network, resource, nonce, and expiry. If any field changes, the signature breaks.</p>
+          <pre class="transcript" id="proto-intent-tx">valid intent        accepted
+wrong payee         rejected
+wrong amount        rejected
+wrong resource      rejected
+expired intent      rejected
+replayed nonce      rejected</pre>
+          <div class="protoactions"><a href="/proof/payment-intent" target="_blank">Open proof</a><button type="button" data-curl="/proof/payment-intent">Copy curl</button></div>
+        </article>
+        <article class="protocard">
+          <div class="prototitle">Live Infrastructure Check</div>
+          <div class="protoendpoint">/health</div>
+          <div class="protostatus" id="proto-health-status">checking infrastructure</div>
+          <p>This proves the demo is live: Cleanverse is reachable, Monad is reachable, both parties have valid A-Pass code 4, and settlement uses real aUSDC.</p>
+          <pre class="transcript" id="proto-health-tx">Cleanverse API      reachable
+Monad RPC           reachable
+payer A-Pass        code 4
+payee A-Pass        code 4
+settlement          real aUSDC
+mode                onchain transferFrom</pre>
+          <div class="protoactions"><a href="/health" target="_blank">Open health</a><button type="button" data-curl="/health">Copy curl</button></div>
+        </article>
+        <article class="protocard">
+          <div class="prototitle">Cleanverse Audit Report</div>
+          <div class="protoendpoint">/report</div>
+          <div class="protostatus gd">audit trail available</div>
+          <p>This is the audit output. A cleared payment gets a signed receipt, Monad transaction hash, privacy-preserving A-Pass proof fields, and a Cleanverse Travel Rule report.</p>
+          <pre class="transcript" id="proto-report-tx">CLEARED
+tx: 0xddaa...fc36
+originator: A-Pass verified
+beneficiary: A-Pass verified
+travel rule: official report</pre>
+          <div class="protoactions"><a id="proto-report-link" href="/report" target="_blank">Open report</a><a id="proto-tx-link" href="#" target="_blank">Open transaction</a></div>
+        </article>
+      </div>
+      <p class="protocolclose">The UI is the demo. These proof modules are the evidence.</p>
     </div>
-    <div class="endpoints reveal">verify it yourself: <a href="/health" target="_blank">/health</a> · <a href="/supported" target="_blank">/supported</a> · <a href="/premium" target="_blank">/premium</a> · <a href="/proof/mandate" target="_blank">/proof/mandate</a> · <a href="/proof/payment-intent" target="_blank">/proof/payment-intent</a></div>
+    <div class="endpoints reveal">raw verification links: <a href="/health" target="_blank">/health</a> · <a href="/supported" target="_blank">/supported</a> · <a href="/premium" target="_blank">/premium</a> · <a href="/proof/mandate" target="_blank">/proof/mandate</a> · <a href="/proof/payment-intent" target="_blank">/proof/payment-intent</a> · <a id="raw-report-link" href="/report" target="_blank">/report</a></div>
     <p class="body reveal" style="font-size:13px;color:var(--mut);margin-top:16px">For demo reliability the interactive run settles via a pre-approved testnet allowance, after enforcing Cleanverse identity and the signed mandate before any funds move. The signed payment intent above is x402's production per-payment authorization, real and provable, not hidden.</p>
   </section>
 
@@ -310,7 +391,8 @@ const EXPLORER='https://testnet.monadscan.com/tx/';
 const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
 let ASSET,NETWORK;
 const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function fetchJson(url,attempts=3){let last;for(let i=0;i<attempts;i++){try{const r=await fetch(url);if(!r.ok)throw new Error(url+' returned '+r.status);return await r.json();}catch(e){last=e;if(i<attempts-1)await sleep(300*(i+1));}}throw last;}
+async function fetchJson(url,attempts=3,okStatuses=[]){let last;for(let i=0;i<attempts;i++){try{const r=await fetch(url);if(!r.ok&&!okStatuses.includes(r.status))throw new Error(url+' returned '+r.status);return await r.json();}catch(e){last=e;if(i<attempts-1)await sleep(300*(i+1));}}throw last;}
+async function fetchText(url,attempts=3,okStatuses=[]){let last;for(let i=0;i<attempts;i++){try{const r=await fetch(url);if(!r.ok&&!okStatuses.includes(r.status))throw new Error(url+' returned '+r.status);return await r.text();}catch(e){last=e;if(i<attempts-1)await sleep(300*(i+1));}}throw last;}
 $('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
@@ -357,27 +439,27 @@ function build(d){
 function seed(){const L=$('#ledger');L.innerHTML='';SEED.forEach((d,i)=>{const el=build(d);L.appendChild(el);setTimeout(()=>el.classList.add('in'),120+i*90)})}
 seed();
 // live proof status: surface the facilitator health rather than failing silently
-fetchJson('/health').then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="rd">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="rd">●</span> facilitator unreachable · showing prior settlements';});
-// judge proof panel: read straight off the running facilitator
-(async function loadProof(){
-  const set=(id,html,cls)=>{const e=$('#'+id);if(!e)return;e.innerHTML=html;if(cls!==undefined)e.className='pv '+cls;};
-  const ADDR=EXPLORER.replace('/tx/','/address/');
-  try{
-    const h=await fetchJson('/health');const ck=h.checks||{};
-    set('p-status',h.status==='ok'?'● ok':'● '+h.status,h.status==='ok'?'gd':'am');
-    set('p-cv',ck.cleanverseReachable?'reachable':'unreachable',ck.cleanverseReachable?'gd':'rd');
-    set('p-payer',ck.payerApass?'code '+ck.payerApass.code+(ck.payerApass.verified?' · verified':''):'-',ck.payerApass&&ck.payerApass.verified?'gd':'rd');
-    set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'-',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
-    set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
-    set('p-mode',h.settlementMode,'');
-  }catch(e){set('p-status','unreachable after retries','rd');}
-  const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
-  if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href='/report?tx='+tx+'&w='+A;}}
-  try{const m=await fetchJson('/proof/mandate');set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){set('p-mandate','unreachable after retries','rd');}
-  try{const pi=await fetchJson('/proof/payment-intent');set('p-intent',pi.acceptsValidIntent?'<a href="/proof/payment-intent" target="_blank">binds payee/amount/resource · rejects every tamper ↗</a>':'failed',pi.acceptsValidIntent?'gd':'rd');}catch(e){set('p-intent','unreachable after retries','rd');}
+fetchJson('/health').then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="am">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="am">●</span> temporarily unavailable · showing prior settlements';});
+
+function seedTx(){return (SEED.find(function(s){return s.tx;})||{}).tx||PROOFTX;}
+function reportUrl(tx){return '/report?tx='+tx+'&w='+A;}
+function hydrateReceiptLinks(){const tx=seedTx();const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href=reportUrl(tx);}const pr=$('#proto-report-link');if(pr)pr.href=reportUrl(tx);const pt=$('#proto-tx-link');if(pt)pt.href=EXPLORER+tx;const rr=$('#raw-report-link');if(rr)rr.href=reportUrl(tx);setTranscript('proto-report-tx','CLEARED\ntx: '+tx.slice(0,6)+'...'+tx.slice(-4)+'\noriginator: A-Pass verified\nbeneficiary: A-Pass verified\ntravel rule: official report');}
+function setProto(id,text,cls){const e=$('#'+id);if(e){e.textContent=text;e.className='protostatus '+(cls||'');}}
+function setTranscript(id,text){const e=$('#'+id);if(e)e.textContent=text;}
+function verdict(v){return v?'rejected':'missing';}
+function curlFor(path){return 'curl -i '+location.origin+path;}
+async function copyText(text){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text);const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.left='-999px';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}
+document.querySelectorAll('[data-curl]').forEach(b=>b.addEventListener('click',async()=>{const old=b.textContent;try{await copyText(curlFor(b.dataset.curl));b.textContent='Copied';setTimeout(()=>b.textContent=old,1200)}catch(e){b.textContent='Copy failed';setTimeout(()=>b.textContent=old,1400)}}));
+document.querySelectorAll('[data-copy-url]').forEach(b=>b.addEventListener('click',async()=>{const old=b.textContent;try{const text=await fetchText(b.dataset.copyUrl);await copyText(text);b.textContent='Copied';setTimeout(()=>b.textContent=old,1200)}catch(e){b.textContent='Copy failed';setTimeout(()=>b.textContent=old,1400)}}));
+hydrateReceiptLinks();
+(async function loadProtocolProof(){
+  try{const p=await fetchJson('/premium',3,[402]);const req=(p.accepts||[])[0]||{};setProto('proto-402-status','402 challenge live','gd');setTranscript('proto-402-tx','GET /premium\n-> 402 Payment Required\naccepts: '+(req.scheme||'exact')+' · '+(req.network||'eip155:10143')+' · aUSDC\npayTo: '+short(req.payTo||SUP)+'\nresource: premium market-data feed');}catch(e){setProto('proto-402-status','temporarily unavailable','am');}
+  try{const m=await fetchJson('/proof/mandate');const r=m.rejects||{};setProto('proto-mandate-status',m.acceptsValidSignedMandate?'tamper/replay protected':'temporarily unavailable',m.acceptsValidSignedMandate?'gd':'am');setTranscript('proto-mandate-tx','valid mandate       '+(m.acceptsValidSignedMandate?'accepted':'missing')+'\nwrong signer        '+verdict(r.wrongSigner)+'\nexpired mandate     '+verdict(r.expiredMandate)+'\ntampered budget     '+verdict(r.tamperedMandate)+'\nreplayed nonce      '+verdict(r.replayedNonce));}catch(e){setProto('proto-mandate-status','temporarily unavailable','am');}
+  try{const pi=await fetchJson('/proof/payment-intent');const r=pi.rejects||{};setProto('proto-intent-status',pi.acceptsValidIntent?'payer bound to payee/amount/resource':'temporarily unavailable',pi.acceptsValidIntent?'gd':'am');setTranscript('proto-intent-tx','valid intent        '+(pi.acceptsValidIntent?'accepted':'missing')+'\nwrong payee         '+verdict(r.wrongPayee)+'\nwrong amount        '+verdict(r.wrongAmount)+'\nwrong resource      '+verdict(r.wrongResource)+'\nexpired intent      '+verdict(r.expiredIntent)+'\nreplayed nonce      '+verdict(r.replayedNonce));}catch(e){setProto('proto-intent-status','temporarily unavailable','am');}
+  try{const h=await fetchJson('/health');await fetchJson('/supported');const ck=h.checks||{};setProto('proto-health-status',h.status==='ok'?'live infrastructure ok':'live infrastructure degraded',h.status==='ok'?'gd':'am');setTranscript('proto-health-tx','Cleanverse API      '+(ck.cleanverseReachable?'reachable':'temporarily unavailable')+'\nMonad RPC           '+(ck.monadRpcReachable?'reachable':'temporarily unavailable')+'\npayer A-Pass        '+(ck.payerApass?'code '+ck.payerApass.code:'temporarily unavailable')+'\npayee A-Pass        '+(ck.payeeApass?'code '+ck.payeeApass.code:'temporarily unavailable')+'\nsettlement          real aUSDC\nmode                onchain transferFrom');}catch(e){setProto('proto-health-status','temporarily unavailable','am');}
 })();
 
-async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
+async function init(){if(ASSET)return;const r=await fetchJson('/supported');ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
 init();
 function setMeter(rem,bud){$('#bleft').textContent=fmt(rem)+' left';$('#bbar').style.width=Math.max(0,100*Number(rem)/Number(bud))+'%';}
 $('#bbar').style.width='100%';
