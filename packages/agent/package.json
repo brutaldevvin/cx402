@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "cx402 Agent SDK — give an AI agent a compliance mandate; it pays only when the payment is verified and within policy.",
+  "description": "cx402 Agent SDK - give an AI agent a compliance mandate; it pays only when the payment is verified and within policy.",
   "exports": {
     ".": "./src/index.ts"
   },

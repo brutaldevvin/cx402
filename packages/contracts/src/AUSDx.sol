@@ -7,7 +7,7 @@ interface IAPass {
     function balanceOf(address owner) external view returns (uint256);
 }
 
-/// @title aUSDx — cx402 stand-in for aUSDC.
+/// @title aUSDx - cx402 stand-in for aUSDC.
 /// A minimal ERC-20 that enforces the REAL Cleanverse A-Pass registry on-chain:
 /// it can only be minted to, or transferred between, wallets that hold an A-Pass.
 /// This reproduces aUSDC's "clean funds by construction" property (the NoAPass

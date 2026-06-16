@@ -147,14 +147,14 @@
     <p class="body reveal">Every value below is read straight off the running facilitator when you loaded this page, and is independently checkable.</p>
     <div class="ppanel reveal">
       <div class="prow"><span class="pk">facilitator</span><span class="pv" id="p-status">checking…</span></div>
-      <div class="prow"><span class="pk">Cleanverse API</span><span class="pv" id="p-cv">—</span></div>
-      <div class="prow"><span class="pk">payer A-Pass</span><span class="pv" id="p-payer">—</span></div>
-      <div class="prow"><span class="pk">payee A-Pass</span><span class="pv" id="p-payee">—</span></div>
-      <div class="prow"><span class="pk">settlement asset</span><span class="pv" id="p-asset">—</span></div>
-      <div class="prow"><span class="pk">mode</span><span class="pv" id="p-mode">—</span></div>
-      <div class="prow"><span class="pk">latest settlement</span><span class="pv" id="p-tx">—</span></div>
-      <div class="prow"><span class="pk">travel rule</span><span class="pv" id="p-report">—</span></div>
-      <div class="prow"><span class="pk">signed mandate</span><span class="pv" id="p-mandate">—</span></div>
+      <div class="prow"><span class="pk">Cleanverse API</span><span class="pv" id="p-cv">-</span></div>
+      <div class="prow"><span class="pk">payer A-Pass</span><span class="pv" id="p-payer">-</span></div>
+      <div class="prow"><span class="pk">payee A-Pass</span><span class="pv" id="p-payee">-</span></div>
+      <div class="prow"><span class="pk">settlement asset</span><span class="pv" id="p-asset">-</span></div>
+      <div class="prow"><span class="pk">mode</span><span class="pv" id="p-mode">-</span></div>
+      <div class="prow"><span class="pk">latest settlement</span><span class="pv" id="p-tx">-</span></div>
+      <div class="prow"><span class="pk">travel rule</span><span class="pv" id="p-report">-</span></div>
+      <div class="prow"><span class="pk">signed mandate</span><span class="pv" id="p-mandate">-</span></div>
     </div>
   </section>
 
@@ -331,8 +331,8 @@ fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status=
     const h=await fetch('/health').then(r=>r.json());const ck=h.checks||{};
     set('p-status',h.status==='ok'?'● ok':'● '+h.status,h.status==='ok'?'gd':'am');
     set('p-cv',ck.cleanverseReachable?'reachable':'unreachable',ck.cleanverseReachable?'gd':'rd');
-    set('p-payer',ck.payerApass?'code '+ck.payerApass.code+(ck.payerApass.verified?' · verified':''):'—',ck.payerApass&&ck.payerApass.verified?'gd':'rd');
-    set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'—',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
+    set('p-payer',ck.payerApass?'code '+ck.payerApass.code+(ck.payerApass.verified?' · verified':''):'-',ck.payerApass&&ck.payerApass.verified?'gd':'rd');
+    set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'-',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
     set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
     set('p-mode',h.settlementMode,'');
   }catch(e){set('p-status','unreachable','rd');}

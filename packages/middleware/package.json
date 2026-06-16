@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "cx402 merchant middleware — one line to 402-protect a route so it only accepts verified, settled payments.",
+  "description": "cx402 merchant middleware - one line to 402-protect a route so it only accepts verified, settled payments.",
   "exports": {
     ".": "./src/index.ts"
   },

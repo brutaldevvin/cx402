@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Typed client for the Cleanverse API (A-Pass identity, A-Token compliance) — the live foundation cx402 builds on.",
+  "description": "Typed client for the Cleanverse API (A-Pass identity, A-Token compliance) - the live foundation cx402 builds on.",
   "exports": {
     ".": "./src/index.ts"
   },

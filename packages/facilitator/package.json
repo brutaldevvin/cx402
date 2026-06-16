@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "cx402 — the compliant x402 facilitator: A-Pass gate + A-Token settlement + Travel-Rule receipt.",
+  "description": "cx402, the compliant x402 facilitator: A-Pass gate, policy mandate, on-chain settlement, signed Travel-Rule receipt.",
   "exports": {
     ".": "./src/index.ts"
   },
