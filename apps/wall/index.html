@@ -47,6 +47,16 @@
   .prow .pv{color:var(--ink);text-align:right}.prow .pv a{color:inherit;text-decoration:none}.prow .pv a:hover{text-decoration:underline}
   .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
   .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:14px;line-height:2}.endpoints a{color:var(--ink2);text-decoration:none}.endpoints a:hover{color:var(--green)}
+  .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px}.hook .d{color:var(--green)}
+  .hstrip{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+  .hsig{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);background:var(--card);border:1px solid var(--edge);border-radius:30px;padding:7px 14px;text-decoration:none;white-space:nowrap}
+  .hsig.ok{color:var(--green);border-color:#0a9a4540;background:#0a9a450c}
+  .herodemo{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:22px;align-items:start}
+  .hdleft{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:20px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4)}
+  .hflds{display:flex;gap:12px;margin-bottom:14px}.hflds label{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut)}
+  .hflds input{display:block;width:100%;margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:9px 10px}
+  .hlinks{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:13px;line-height:1.9}.hlinks a{color:var(--ink2);text-decoration:none}.hlinks a:hover{color:var(--green)}
+  @media(max-width:860px){.herodemo{grid-template-columns:1fr}}
 
   section{padding:46px 0;border-top:1px dashed var(--line)}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
@@ -125,20 +135,30 @@
 <div class="ticker"><div class="run" id="ticker"></div></div>
 
 <main>
-  <div class="hero">
-    <div class="herogrid">
-      <div>
-        <h1 class="h1" id="h1"></h1>
-        <p class="lead">A compliance toolkit for agent payments. Give an AI agent a wallet and a <b>mandate</b>, and it pays only when the counterparty is <b>verified</b> and the payment is <b>within policy</b>. Powered by Cleanverse, settled on Monad.</p>
-      </div>
-      <div class="heror">
-        <div class="cbox"><span class="ci">◆</span><div class="ct">A-Pass identity</div><div class="cd">both parties verified against the live registry</div></div>
-        <div class="cbox"><span class="ci">◆</span><div class="ct">policy mandate</div><div class="cd">budget, caps and rules the agent obeys</div></div>
-        <div class="cbox"><span class="ci">◆</span><div class="ct">on-chain settlement</div><div class="cd">real aUSDC, live on Monad</div></div>
-        <div class="cbox"><span class="ci">◆</span><div class="ct">verified receipt</div><div class="cd">signed, auditable, no personal data</div></div>
-      </div>
+  <div class="hero" id="live">
+    <div class="eyebrow">live · real aUSDC on monad</div>
+    <h1 class="hook" id="h1">An AI agent tries six payments. cx402 settles only the <span class="d">verified, in-policy</span> ones.</h1>
+    <p class="lead">The rest are blocked before money moves. Every cleared payment is real aUSDC on Monad, checked against Cleanverse A-Pass and recorded in a Travel Rule report.</p>
+    <div class="hstrip">
+      <span class="hsig" id="h-cv">● checking Cleanverse…</span>
+      <span class="hsig" id="h-payer">payer A-Pass -</span>
+      <span class="hsig" id="h-payee">payee A-Pass -</span>
+      <a class="hsig ok" id="proofbadge" target="_blank">real aUSDC on Monad ✓</a>
     </div>
-    <a class="ausdcproof" id="proofbadge" target="_blank"><span class="c">✓</span> proven on the real aUSDC A-Token, <b>0xf879…fecbcd</b> ↗</a>
+    <div class="herodemo">
+      <div class="hdleft">
+        <div class="hflds">
+          <label>budget<input id="budget" value="0.004"></label>
+          <label>max / payment<input id="maxtx" value="0.002"></label>
+        </div>
+        <input id="mintier" type="hidden" value="1">
+        <button class="runbtn" id="run">▶ run procurement agent</button>
+        <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
+        <div class="hlinks"><a id="h-tx" target="_blank">latest tx -</a> · <a id="h-report" target="_blank">travel rule report -</a></div>
+        <div class="note" id="livestatus"><span style="color:var(--mut)">●</span> checking live status…</div>
+      </div>
+      <div class="hdright"><div class="ledger" id="ledger"></div></div>
+    </div>
   </div>
 
   <!-- LIVE PROOF PANEL -->
@@ -160,27 +180,6 @@
     </div>
     <div class="endpoints reveal">verify it yourself: <a href="/health" target="_blank">/health</a> · <a href="/supported" target="_blank">/supported</a> · <a href="/premium" target="_blank">/premium</a> · <a href="/proof/mandate" target="_blank">/proof/mandate</a> · <a href="/proof/payment-intent" target="_blank">/proof/payment-intent</a></div>
     <p class="body reveal" style="font-size:13px;color:var(--mut);margin-top:16px">For demo reliability the interactive run settles via a pre-approved testnet allowance, after enforcing Cleanverse identity and the signed mandate before any funds move. The signed payment intent above is x402's production per-payment authorization, real and provable, not hidden.</p>
-  </section>
-
-  <!-- LIVE -->
-  <section id="live">
-    <div class="eyebrow reveal">try it · live on monad</div>
-    <h2 class="h2 reveal">Set a mandate. Run the agent. Watch it get governed.</h2>
-    <p class="body reveal">The real facilitator. Set the agent's budget and per-payment cap, then run a procurement session. Verified, in-policy payments settle on-chain; everything else is refused, by identity or by policy. <span style="color:var(--mut)">The interactive run settles real aUSDC on Monad in tiny amounts (0.001 per cleared payment), so every cleared receipt links to a real transaction.</span></p>
-    <div class="live">
-      <div class="panel reveal">
-        <h3>agent mandate</h3>
-        <div class="fld"><label>weekly budget</label><div class="pre"><input id="budget" value="0.004"></div></div>
-        <div class="fld"><label>max per payment</label><div class="pre"><input id="maxtx" value="0.002"></div></div>
-        <div class="fld plain"><label>min counterparty tier</label><input id="mintier" value="1"></div>
-        <div class="note"><span class="ok">●</span> counterparties: verified A-Pass, or an allow-list</div>
-        <button class="runbtn" id="run">▶ run procurement agent</button>
-        <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
-        <div class="note" id="livestatus"><span style="color:var(--mut)">●</span> checking live status…</div>
-        <div class="note"><span class="ok">●</span> production uses signed mandates · <a href="/proof/mandate" target="_blank">verify the signed path ↗</a></div>
-      </div>
-      <div class="ledger" id="ledger"></div>
-    </div>
   </section>
 
   <!-- HOW -->
@@ -280,7 +279,6 @@ const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbc
 let ASSET,NETWORK;
 const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
 $('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
-$('#h1').innerHTML='The compliant version of x402.'.split(' ').map((w,i)=>{const d=w.endsWith('.')?'<span class="d">.</span>':'';return `<span style="animation-delay:${.12+i*.1}s">${w.replace('.','')}${d}</span>`}).join(' ');
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
 const TX=[
@@ -339,9 +337,13 @@ fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status=
     set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'-',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
     set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
     set('p-mode',h.settlementMode,'');
+    const sig=(id,html,ok)=>{const e=$('#'+id);if(!e)return;e.innerHTML=html;e.className='hsig'+(ok?' ok':'');};
+    sig('h-cv',ck.cleanverseReachable?'● Cleanverse reachable':'● Cleanverse unreachable',ck.cleanverseReachable);
+    sig('h-payer','payer A-Pass '+(ck.payerApass?'code '+ck.payerApass.code:'-'),ck.payerApass&&ck.payerApass.verified);
+    sig('h-payee','payee A-Pass '+(ck.payeeApass?'code '+ck.payeeApass.code:'-'),ck.payeeApass&&ck.payeeApass.verified);
   }catch(e){set('p-status','unreachable','rd');}
   const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
-  if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');}
+  if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href='/report?tx='+tx+'&w='+A;}}
   try{const m=await fetch('/proof/mandate').then(r=>r.json());set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){}
   try{const pi=await fetch('/proof/payment-intent').then(r=>r.json());set('p-intent',pi.acceptsValidIntent?'<a href="/proof/payment-intent" target="_blank">binds payee/amount/resource · rejects every tamper ↗</a>':'failed',pi.acceptsValidIntent?'gd':'rd');}catch(e){}
 })();
