@@ -72,7 +72,7 @@ export function loadFacilitatorConfig(opts: { envPath?: string } = {}): Facilita
     settlementMode: mode === 'ausdx' && pkey && asset ? 'ausdx' : 'simulated',
     facilitatorPkey: pkey ? (pkey as Address) : undefined,
     apassAddress: get('APASS_ADDRESS') as Address,
-    demoAllowUnsignedPolicy: get('DEMO_ALLOW_UNSIGNED_POLICY') === 'true',
+    demoAllowUnsignedPolicy: ['true', '1', 'yes', 'on'].includes(get('DEMO_ALLOW_UNSIGNED_POLICY').trim().toLowerCase()),
     demoPayer: get('DEMO_PAYER', '0x03681955065AF6EA51660dd63e7634fd0dE4d0a8') as Address,
     demoPayee: get('DEMO_PAYEE', '0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB') as Address,
   }

@@ -309,7 +309,8 @@ $('#run').addEventListener('click',async()=>{
   try{
     await init();
     $('#ledger').innerHTML='';const budgetBase=toBase($('#budget').value);setMeter(budgetBase,budgetBase);
-    await fetch('/policy',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent:A,policy:{budget:budgetBase,maxPerTx:toBase($('#maxtx').value),minTier:Number($('#mintier').value)||0}})});
+    const polRes=await fetch('/policy',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent:A,policy:{budget:budgetBase,maxPerTx:toBase($('#maxtx').value),minTier:Number($('#mintier').value)||0}})});
+    if(!polRes.ok)throw new Error('policy registration unavailable');
     for(const step of STEPS){
       const pending=build({amount:step.amount,payee:step.payee,purpose:step.purpose,status:''});$('#ledger').appendChild(pending);requestAnimationFrame(()=>pending.classList.add('in'));
       pending.querySelector('.stamp').textContent='evaluating…';await sleep(420);
