@@ -310,6 +310,7 @@ const EXPLORER='https://testnet.monadscan.com/tx/';
 const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
 let ASSET,NETWORK;
 const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function fetchJson(url,attempts=3){let last;for(let i=0;i<attempts;i++){try{const r=await fetch(url);if(!r.ok)throw new Error(url+' returned '+r.status);return await r.json();}catch(e){last=e;if(i<attempts-1)await sleep(300*(i+1));}}throw last;}
 $('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
@@ -356,24 +357,24 @@ function build(d){
 function seed(){const L=$('#ledger');L.innerHTML='';SEED.forEach((d,i)=>{const el=build(d);L.appendChild(el);setTimeout(()=>el.classList.add('in'),120+i*90)})}
 seed();
 // live proof status: surface the facilitator health rather than failing silently
-fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="rd">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="rd">●</span> facilitator unreachable · showing prior settlements';});
+fetchJson('/health').then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="rd">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="rd">●</span> facilitator unreachable · showing prior settlements';});
 // judge proof panel: read straight off the running facilitator
 (async function loadProof(){
   const set=(id,html,cls)=>{const e=$('#'+id);if(!e)return;e.innerHTML=html;if(cls!==undefined)e.className='pv '+cls;};
   const ADDR=EXPLORER.replace('/tx/','/address/');
   try{
-    const h=await fetch('/health').then(r=>r.json());const ck=h.checks||{};
+    const h=await fetchJson('/health');const ck=h.checks||{};
     set('p-status',h.status==='ok'?'● ok':'● '+h.status,h.status==='ok'?'gd':'am');
     set('p-cv',ck.cleanverseReachable?'reachable':'unreachable',ck.cleanverseReachable?'gd':'rd');
     set('p-payer',ck.payerApass?'code '+ck.payerApass.code+(ck.payerApass.verified?' · verified':''):'-',ck.payerApass&&ck.payerApass.verified?'gd':'rd');
     set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'-',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
     set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
     set('p-mode',h.settlementMode,'');
-  }catch(e){set('p-status','unreachable','rd');}
+  }catch(e){set('p-status','unreachable after retries','rd');}
   const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
   if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href='/report?tx='+tx+'&w='+A;}}
-  try{const m=await fetch('/proof/mandate').then(r=>r.json());set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){}
-  try{const pi=await fetch('/proof/payment-intent').then(r=>r.json());set('p-intent',pi.acceptsValidIntent?'<a href="/proof/payment-intent" target="_blank">binds payee/amount/resource · rejects every tamper ↗</a>':'failed',pi.acceptsValidIntent?'gd':'rd');}catch(e){}
+  try{const m=await fetchJson('/proof/mandate');set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){set('p-mandate','unreachable after retries','rd');}
+  try{const pi=await fetchJson('/proof/payment-intent');set('p-intent',pi.acceptsValidIntent?'<a href="/proof/payment-intent" target="_blank">binds payee/amount/resource · rejects every tamper ↗</a>':'failed',pi.acceptsValidIntent?'gd':'rd');}catch(e){set('p-intent','unreachable after retries','rd');}
 })();
 
 async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
