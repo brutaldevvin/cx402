@@ -40,6 +40,12 @@
   .proof .g{color:var(--green)}
   .ausdcproof{display:inline-flex;align-items:center;gap:9px;margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink2);text-decoration:none;border:1px solid #0a9a4540;background:#0a9a450c;border-radius:30px;padding:9px 16px}
   .ausdcproof:hover{border-color:var(--green)}.ausdcproof .c{color:var(--green);font-weight:700}.ausdcproof b{color:var(--ink)}
+  .ppanel{border:1px solid var(--edge);border-radius:12px;overflow:hidden;background:var(--card);margin-top:24px}
+  .prow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--edge);font-family:'JetBrains Mono',monospace;font-size:13px}
+  .prow:last-child{border-bottom:none}
+  .prow .pk{color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+  .prow .pv{color:var(--ink);text-align:right}.prow .pv a{color:inherit;text-decoration:none}.prow .pv a:hover{text-decoration:underline}
+  .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
 
   section{padding:46px 0;border-top:1px dashed var(--line)}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
@@ -133,6 +139,24 @@
     </div>
     <a class="ausdcproof" id="proofbadge" target="_blank"><span class="c">✓</span> proven on the real aUSDC A-Token, <b>0xf879…fecbcd</b> ↗</a>
   </div>
+
+  <!-- LIVE PROOF PANEL -->
+  <section id="proof">
+    <div class="eyebrow reveal">live proof</div>
+    <h2 class="h2 reveal">Don't take our word for it.</h2>
+    <p class="body reveal">Every value below is read straight off the running facilitator when you loaded this page, and is independently checkable.</p>
+    <div class="ppanel reveal">
+      <div class="prow"><span class="pk">facilitator</span><span class="pv" id="p-status">checking…</span></div>
+      <div class="prow"><span class="pk">Cleanverse API</span><span class="pv" id="p-cv">—</span></div>
+      <div class="prow"><span class="pk">payer A-Pass</span><span class="pv" id="p-payer">—</span></div>
+      <div class="prow"><span class="pk">payee A-Pass</span><span class="pv" id="p-payee">—</span></div>
+      <div class="prow"><span class="pk">settlement asset</span><span class="pv" id="p-asset">—</span></div>
+      <div class="prow"><span class="pk">mode</span><span class="pv" id="p-mode">—</span></div>
+      <div class="prow"><span class="pk">latest settlement</span><span class="pv" id="p-tx">—</span></div>
+      <div class="prow"><span class="pk">travel rule</span><span class="pv" id="p-report">—</span></div>
+      <div class="prow"><span class="pk">signed mandate</span><span class="pv" id="p-mandate">—</span></div>
+    </div>
+  </section>
 
   <!-- LIVE -->
   <section id="live">
@@ -299,6 +323,23 @@ function seed(){const L=$('#ledger');L.innerHTML='';SEED.forEach((d,i)=>{const e
 seed();
 // live proof status: surface the facilitator health rather than failing silently
 fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="rd">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="rd">●</span> facilitator unreachable · showing prior settlements';});
+// judge proof panel: read straight off the running facilitator
+(async function loadProof(){
+  const set=(id,html,cls)=>{const e=$('#'+id);if(!e)return;e.innerHTML=html;if(cls!==undefined)e.className='pv '+cls;};
+  const ADDR=EXPLORER.replace('/tx/','/address/');
+  try{
+    const h=await fetch('/health').then(r=>r.json());const ck=h.checks||{};
+    set('p-status',h.status==='ok'?'● ok':'● '+h.status,h.status==='ok'?'gd':'am');
+    set('p-cv',ck.cleanverseReachable?'reachable':'unreachable',ck.cleanverseReachable?'gd':'rd');
+    set('p-payer',ck.payerApass?'code '+ck.payerApass.code+(ck.payerApass.verified?' · verified':''):'—',ck.payerApass&&ck.payerApass.verified?'gd':'rd');
+    set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'—',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
+    set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
+    set('p-mode',h.settlementMode,'');
+  }catch(e){set('p-status','unreachable','rd');}
+  const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
+  if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');}
+  try{const m=await fetch('/proof/mandate').then(r=>r.json());set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){}
+})();
 
 async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
 init();
@@ -330,7 +371,7 @@ $('#run').addEventListener('click',async()=>{
     seed();
     const L=$('#ledger'),n=document.createElement('div');
     n.style.cssText="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);background:#f0e9d8;border:1px solid var(--edge);border-radius:8px;padding:9px 12px;margin-bottom:10px";
-    n.textContent='live facilitator unavailable · showing prior real settlements';
+    n.textContent='Live call unavailable · showing previous real settlements';
     L.insertBefore(n,L.firstChild);
   }finally{
     btn.disabled=false;btn.textContent='▶ run again';

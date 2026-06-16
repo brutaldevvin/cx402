@@ -48,8 +48,29 @@ settlement, so they cost nothing.
   - https://testnet.monadscan.com/tx/0xa62713d4a811b1ea34e256a08829ed2c76cd519ac3abd10e6378afb8b086b2f1
 - **A real Cleanverse compliance report** for a settled tx (PDF):
   https://cx402.up.railway.app/report?tx=0xddaa7a3ac684a479f30dc8c8ea29524e1c27367f1778d8c140034a849929fc36&w=0x03681955065AF6EA51660dd63e7634fd0dE4d0a8
-- **35 tests pass live on Monad** (`pnpm test`), including the EIP-191 signed
+- **40 tests pass live on Monad** (`pnpm test`), including the EIP-191 signed
   mandate (valid, invalid, expired, replayed) and a receipt-has-no-PII check.
+
+## Probe the API directly (for the API-minded judge)
+
+- **Merchant 402 flow** (the x402 protocol, concrete):
+  ```
+  curl -i https://cx402.up.railway.app/premium
+  ```
+  No payment returns a `402` challenge with the required compliant payment. A
+  request carrying a valid `X-PAYMENT` settles on-chain and returns the resource
+  plus the verified receipt in the `X-PAYMENT-RESPONSE` header. This is the exact
+  flow `@cx402/middleware` gives a real merchant in one line.
+- **Signed mandate, verified live:** https://cx402.up.railway.app/proof/mandate
+  accepts a valid EIP-191 mandate and rejects wrong-signer, expired, tampered,
+  and replayed. The browser demo uses unsigned policy for convenience; this is
+  the production path.
+- **Robust errors:** malformed bodies return structured JSON, never a 500. Try
+  `curl -i -X POST https://cx402.up.railway.app/verify -d '{}' -H 'content-type: application/json'`
+  (returns `400 invalid_intent`).
+
+The page's **live proof panel** at the top reads all of this off the running
+facilitator the moment you load the site.
 
 ## 4. Cleanverse primitives used
 

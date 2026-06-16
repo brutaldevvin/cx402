@@ -56,6 +56,9 @@ importers:
       '@cx402/cleanverse':
         specifier: workspace:*
         version: link:../cleanverse
+      '@cx402/middleware':
+        specifier: workspace:*
+        version: link:../middleware
       '@hono/node-server':
         specifier: ^1.13.7
         version: 1.19.14(hono@4.12.25)

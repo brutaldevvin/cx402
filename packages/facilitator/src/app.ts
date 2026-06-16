@@ -198,6 +198,32 @@ export function createApp(d: Deps): Hono {
     })
   })
 
+  // a live merchant route: the exact x402 flow @cx402/middleware gives a seller in
+  // one line. no payment -> 402 challenge; a valid payment settles and is served
+  // with the verified receipt in X-PAYMENT-RESPONSE.
+  app.get('/premium', async (c) => {
+    const requirements = {
+      scheme: 'exact', network: d.cfg.network, asset: d.cfg.settlementAsset,
+      payTo: d.cfg.demoPayee, maxAmountRequired: '1000', resource: '/premium',
+      description: 'cx402 premium market-data feed',
+    }
+    const header = c.req.header('X-PAYMENT')
+    if (!header) return c.json({ x402Version: 1, accepts: [requirements] }, 402)
+    let payment: unknown
+    try {
+      payment = JSON.parse(Buffer.from(header, 'base64').toString('utf8'))
+    } catch {
+      return c.json({ error: 'invalid_payment_header' }, 400)
+    }
+    const res = await app.request('/settle', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ payment, requirements }) })
+    const body = (await res.json()) as { success?: boolean; receipt?: unknown; compliance?: { blockedBy?: string; reason?: string } }
+    if (res.status !== 200 || !body.success) {
+      return c.json({ x402Version: 1, accepts: [requirements], error: 'payment_required', blockedBy: body.compliance?.blockedBy, reason: body.compliance?.reason }, 402)
+    }
+    c.header('X-PAYMENT-RESPONSE', Buffer.from(JSON.stringify(body.receipt)).toString('base64'))
+    return c.json({ data: 'cx402 premium market-data feed', paidWith: 'a verified, in-policy x402 payment', receipt: body.receipt })
+  })
+
   // set an agent's policy mandate. production path: a signed mandate, verified
   // before we trust it. demo path: unsigned, only when explicitly allowed.
   app.post('/policy', async (c) => {

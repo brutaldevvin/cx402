@@ -125,4 +125,13 @@ httpReady('malformed requests return structured errors, not 500', () => {
     expect(b.rejects.tamperedMandate).toBe('invalid_signature')
     expect(b.rejects.replayedNonce).toBe('nonce_replayed')
   })
+
+  it('GET /premium without payment returns a 402 challenge', async () => {
+    const { app } = createFacilitator(cfg)
+    const res = await app.request('/premium')
+    expect(res.status).toBe(402)
+    const b = (await res.json()) as { x402Version: number; accepts: Array<{ maxAmountRequired: string }> }
+    expect(b.x402Version).toBe(1)
+    expect(b.accepts[0]!.maxAmountRequired).toBeTruthy()
+  })
 })
