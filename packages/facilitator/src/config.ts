@@ -21,6 +21,11 @@ export interface FacilitatorConfig {
   /** facilitator EOA: settles transferFrom + signs receipts. Optional (simulated mode). */
   facilitatorPkey?: Address
   apassAddress: Address
+  /** DEMO ONLY: allow unsigned /policy registration (the page can't hold a key). */
+  demoAllowUnsignedPolicy: boolean
+  /** public demo payer/payee, used by the /health probe (no keys needed). */
+  demoPayer: Address
+  demoPayee: Address
 }
 
 function readEnvFile(envPath?: string): Record<string, string> {
@@ -67,5 +72,8 @@ export function loadFacilitatorConfig(opts: { envPath?: string } = {}): Facilita
     settlementMode: mode === 'ausdx' && pkey && asset ? 'ausdx' : 'simulated',
     facilitatorPkey: pkey ? (pkey as Address) : undefined,
     apassAddress: get('APASS_ADDRESS') as Address,
+    demoAllowUnsignedPolicy: get('DEMO_ALLOW_UNSIGNED_POLICY') === 'true',
+    demoPayer: get('DEMO_PAYER', '0x03681955065AF6EA51660dd63e7634fd0dE4d0a8') as Address,
+    demoPayee: get('DEMO_PAYEE', '0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB') as Address,
   }
 }

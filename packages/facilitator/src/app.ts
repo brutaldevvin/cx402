@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
 import { privateKeyToAccount } from 'viem/accounts'
+import { createPublicClient, http, formatEther, formatUnits } from 'viem'
 import type { PrivateKeyAccount } from 'viem'
 import { CleanverseClient } from '@cx402/cleanverse'
 import type { FacilitatorConfig } from './config'
@@ -71,6 +72,57 @@ export function createApp(d: Deps): Hono {
     return c.json(info())
   })
   app.get('/info', (c) => c.json(info()))
+
+  // read-only liveness probe: proves the demo is wired to real infra. never throws.
+  app.get('/health', async (c) => {
+    const payer = (c.req.query('payer') ?? d.cfg.demoPayer) as Address
+    const payee = (c.req.query('payee') ?? d.cfg.demoPayee) as Address
+    const facilitator = d.facilitatorLabel as Address
+    const ERC20 = [
+      { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }] },
+      { type: 'function', name: 'allowance', stateMutability: 'view', inputs: [{ type: 'address' }, { type: 'address' }], outputs: [{ type: 'uint256' }] },
+    ] as const
+    const pc = createPublicClient({ chain: monadChain(d.cfg.chainId, d.cfg.rpcUrl), transport: http(d.cfg.rpcUrl) })
+
+    const settled = await Promise.allSettled([
+      pc.getBlockNumber(),
+      d.cv.verifyApass({ chain: d.cfg.chain, atoken: d.cfg.complianceAsset, address: payer }),
+      d.cv.verifyApass({ chain: d.cfg.chain, atoken: d.cfg.complianceAsset, address: payee }),
+      pc.getBalance({ address: facilitator }),
+      pc.readContract({ address: d.cfg.settlementAsset, abi: ERC20, functionName: 'balanceOf', args: [payer] }),
+      pc.readContract({ address: d.cfg.settlementAsset, abi: ERC20, functionName: 'allowance', args: [payer, facilitator] }),
+    ])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ok = (i: number): any => (settled[i]!.status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<any>).value : null)
+
+    const block = ok(0), pv = ok(1), yv = ok(2), gas = ok(3), bal = ok(4), allow = ok(5)
+    const apass = (addr: Address, v: { code?: number } | null) =>
+      v ? { address: addr, verified: v.code === 4, code: v.code } : { address: addr, verified: false, error: 'unreachable' }
+
+    const checks = {
+      cleanverseReachable: pv != null || yv != null,
+      monadRpcReachable: block != null,
+      settlementAssetConfigured: Boolean(d.cfg.settlementAsset),
+      notSimulated: d.cfg.settlementMode === 'ausdx',
+      payerApass: apass(payer, pv),
+      payeeApass: apass(payee, yv),
+      facilitatorGasMon: gas != null ? formatEther(gas) : null,
+      payerBalance: bal != null ? formatUnits(bal, 6) : null,
+      payerAllowance: allow != null ? (allow >= 2n ** 255n ? 'MAX' : formatUnits(allow, 6)) : null,
+    }
+    const healthy =
+      checks.cleanverseReachable && checks.monadRpcReachable && checks.settlementAssetConfigured &&
+      checks.notSimulated && checks.payerApass.verified && checks.payeeApass.verified &&
+      checks.payerAllowance != null && checks.payerAllowance !== '0.0'
+    return c.json({
+      status: healthy ? 'ok' : 'degraded',
+      facilitator,
+      network: d.cfg.network,
+      settlementAsset: d.cfg.settlementAsset,
+      settlementMode: d.cfg.settlementMode,
+      checks,
+    })
+  })
 
   // x402 conformance: what we accept
   app.get('/supported', (c) =>
