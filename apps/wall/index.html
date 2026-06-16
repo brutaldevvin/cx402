@@ -148,6 +148,8 @@
         <div class="note"><span class="ok">●</span> counterparties: verified A-Pass, or an allow-list</div>
         <button class="runbtn" id="run">▶ run procurement agent</button>
         <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
+        <div class="note" id="livestatus"><span style="color:var(--mut)">●</span> checking live status…</div>
+        <div class="note"><span class="ok">●</span> production uses signed mandates · <a href="/proof/mandate" target="_blank">verify the signed path ↗</a></div>
       </div>
       <div class="ledger" id="ledger"></div>
     </div>
@@ -295,6 +297,8 @@ function build(d){
 }
 function seed(){const L=$('#ledger');L.innerHTML='';SEED.forEach((d,i)=>{const el=build(d);L.appendChild(el);setTimeout(()=>el.classList.add('in'),120+i*90)})}
 seed();
+// live proof status: surface the facilitator health rather than failing silently
+fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span class="ok">●</span> live · facilitator, Cleanverse and Monad reachable':'<span class="rd">●</span> degraded · live calls fall back to prior settlements';}).catch(()=>{$('#livestatus').innerHTML='<span class="rd">●</span> facilitator unreachable · showing prior settlements';});
 
 async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
 init();
@@ -322,8 +326,12 @@ $('#run').addEventListener('click',async()=>{
       await sleep(620);
     }
   }catch(e){
-    // live path unavailable (RPC or creds flaky): fall back to the seeded real receipts
+    // live path unavailable (RPC or creds flaky): fall back to seeded real receipts, labeled
     seed();
+    const L=$('#ledger'),n=document.createElement('div');
+    n.style.cssText="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);background:#f0e9d8;border:1px solid var(--edge);border-radius:8px;padding:9px 12px;margin-bottom:10px";
+    n.textContent='live facilitator unavailable · showing prior real settlements';
+    L.insertBefore(n,L.firstChild);
   }finally{
     btn.disabled=false;btn.textContent='▶ run again';
   }

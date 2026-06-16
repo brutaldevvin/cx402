@@ -93,3 +93,36 @@ httpReady('POST /policy mandate gating', () => {
     expect(res.status).toBe(401)
   })
 })
+
+httpReady('malformed requests return structured errors, not 500', () => {
+  it('POST /verify with empty body returns 400 JSON', async () => {
+    const { app } = createFacilitator(cfg)
+    const res = await app.request('/verify', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
+    expect(res.status).toBe(400)
+    expect(((await res.json()) as { error: string }).error).toBe('invalid_intent')
+  })
+
+  it('POST /verify with non-JSON returns 400 JSON', async () => {
+    const { app } = createFacilitator(cfg)
+    const res = await app.request('/verify', { method: 'POST', body: 'notjson' })
+    expect(res.status).toBe(400)
+    expect(((await res.json()) as { error: string }).error).toBe('invalid_json')
+  })
+
+  it('POST /settle with empty body returns 400, not 500', async () => {
+    const { app } = createFacilitator(cfg)
+    const res = await app.request('/settle', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
+    expect(res.status).toBe(400)
+  })
+
+  it('GET /proof/mandate accepts a valid mandate and rejects every attack', async () => {
+    const { app } = createFacilitator(cfg)
+    const res = await app.request('/proof/mandate')
+    const b = (await res.json()) as { acceptsValidSignedMandate: boolean; rejects: Record<string, string> }
+    expect(b.acceptsValidSignedMandate).toBe(true)
+    expect(b.rejects.wrongSigner).toBe('invalid_signature')
+    expect(b.rejects.expiredMandate).toBe('mandate_expired')
+    expect(b.rejects.tamperedMandate).toBe('invalid_signature')
+    expect(b.rejects.replayedNonce).toBe('nonce_replayed')
+  })
+})

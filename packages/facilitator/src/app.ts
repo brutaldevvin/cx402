@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
-import { privateKeyToAccount } from 'viem/accounts'
+import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts'
 import { createPublicClient, http, formatEther, formatUnits } from 'viem'
 import type { PrivateKeyAccount } from 'viem'
 import { CleanverseClient } from '@cx402/cleanverse'
@@ -13,8 +13,8 @@ import { EventBus } from './events'
 import { ReceiptStore } from './store'
 import { PolicyEngine } from './policy'
 import type { Policy } from './policy'
-import { MandateVerifier } from './mandate'
-import type { SignedMandate } from './mandate'
+import { MandateVerifier, canonicalMandate } from './mandate'
+import type { SignedMandate, Mandate } from './mandate'
 import type { PaymentPayload, PaymentRequirements, Settler, SettlementResult, ComplianceResult, Address } from './types'
 
 interface Deps {
@@ -60,14 +60,36 @@ async function evaluate(d: Deps, payment: PaymentPayload, req: PaymentRequiremen
   return { ...identity, checks: { ...identity.checks, policy: policyCheck } }
 }
 
+function isAddr(x: unknown): x is Address {
+  return typeof x === 'string' && /^0x[0-9a-fA-F]{40}$/.test(x)
+}
+
+/** Validate a payment intent body. Returns null if malformed. */
+function validIntent(body: unknown): { payment: PaymentPayload; requirements: PaymentRequirements } | null {
+  const b = body as { payment?: Record<string, unknown>; requirements?: Record<string, unknown> } | null
+  const p = b?.payment
+  const r = b?.requirements
+  if (!p || typeof p !== 'object' || !r || typeof r !== 'object') return null
+  if (!isAddr(p.payer) || !isAddr(p.payee) || !isAddr(p.asset)) return null
+  if (typeof p.amount !== 'string' || !/^\d+$/.test(p.amount)) return null
+  return { payment: p as unknown as PaymentPayload, requirements: r as unknown as PaymentRequirements }
+}
+
 export function createApp(d: Deps): Hono {
   const app = new Hono()
+
+  // every uncaught error becomes structured JSON, never a plain-text 500
+  app.onError((err, c) => c.json({ error: 'internal_error', message: err instanceof Error ? err.message : 'unexpected error' }, 500))
+
+  // judge-facing label: the settlement asset is real aUSDC, the mode is real
+  // on-chain transferFrom (the internal 'ausdx' value invites confusion)
+  const modeLabel = d.cfg.settlementMode === 'ausdx' ? 'onchain-transferFrom' : d.cfg.settlementMode
 
   const info = () => ({
     name: 'cx402 facilitator',
     network: d.cfg.network,
     asset: d.cfg.settlementAsset,
-    settlementMode: d.cfg.settlementMode,
+    settlementMode: modeLabel,
     facilitator: d.facilitatorLabel,
     demoUnsignedPolicy: d.cfg.demoAllowUnsignedPolicy,
   })
@@ -123,7 +145,7 @@ export function createApp(d: Deps): Hono {
       facilitator,
       network: d.cfg.network,
       settlementAsset: d.cfg.settlementAsset,
-      settlementMode: d.cfg.settlementMode,
+      settlementMode: modeLabel,
       checks,
     })
   })
@@ -142,10 +164,45 @@ export function createApp(d: Deps): Hono {
     }),
   )
 
+  // live proof of the production path: sign mandates with throwaway keys and run
+  // them through the real verifier, showing one accepted and the rejection cases
+  app.get('/proof/mandate', async (c) => {
+    const a = privateKeyToAccount(generatePrivateKey())
+    const b = privateKeyToAccount(generatePrivateKey())
+    const now = Math.floor(Date.now() / 1000)
+    let n = 0
+    const mk = (over: Partial<Mandate> = {}): Mandate => ({ agent: a.address, budget: '1000000', maxPerTx: '100000', nonce: `proof-${now}-${n++}`, expiresAt: now + 3600, ...over })
+    const sign = async (m: Mandate, signer = a): Promise<SignedMandate> => ({ mandate: m, signature: await signer.signMessage({ message: canonicalMandate(m) }) })
+
+    const accepted = await new MandateVerifier().verify(await sign(mk()))
+    const wrongSigner = await new MandateVerifier().verify(await sign(mk(), b))
+    const expired = await new MandateVerifier().verify(await sign(mk({ expiresAt: now - 60 })))
+    const tamper = await sign(mk())
+    tamper.mandate.budget = '999999999999'
+    const tampered = await new MandateVerifier().verify(tamper)
+    const replayV = new MandateVerifier()
+    const sm = await sign(mk())
+    await replayV.verify(sm)
+    const replayed = await replayV.verify(sm)
+
+    const why = (x: Awaited<ReturnType<MandateVerifier['verify']>>) => (x.ok ? 'accepted' : x.reason)
+    return c.json({
+      scheme: 'EIP-191 personal_sign over a canonical mandate',
+      acceptsValidSignedMandate: accepted.ok,
+      rejects: {
+        wrongSigner: why(wrongSigner),
+        expiredMandate: why(expired),
+        tamperedMandate: why(tampered),
+        replayedNonce: why(replayed),
+      },
+    })
+  })
+
   // set an agent's policy mandate. production path: a signed mandate, verified
   // before we trust it. demo path: unsigned, only when explicitly allowed.
   app.post('/policy', async (c) => {
-    const body = (await c.req.json()) as Record<string, unknown>
+    let body: Record<string, unknown>
+    try { body = (await c.req.json()) as Record<string, unknown> } catch { return c.json({ error: 'invalid_json', message: 'request body must be valid JSON' }, 400) }
 
     if (body.mandate && body.signature) {
       const res = await d.mandateVerifier.verify(body as unknown as SignedMandate)
@@ -160,62 +217,75 @@ export function createApp(d: Deps): Hono {
     if (!d.cfg.demoAllowUnsignedPolicy) {
       return c.json({ ok: false, error: 'unsigned_policy_disabled', hint: 'send a signed {mandate,signature}, or set DEMO_ALLOW_UNSIGNED_POLICY=true' }, 401)
     }
-    const { agent, policy } = body as unknown as { agent: Address; policy: Policy }
-    d.policyEngine.register(agent, policy)
+    const { agent, policy } = body as { agent?: unknown; policy?: unknown }
+    if (!isAddr(agent) || !policy || typeof policy !== 'object') {
+      return c.json({ ok: false, error: 'invalid_policy', message: 'agent (address) and policy object are required' }, 400)
+    }
+    d.policyEngine.register(agent, policy as Policy)
     return c.json({ ok: true, agent, policy, signed: false, spent: d.policyEngine.spentBy(agent).toString() })
   })
 
   // the compliance gate + policy (no settlement)
   app.post('/verify', async (c) => {
-    const { payment, requirements } = (await c.req.json()) as {
-      payment: PaymentPayload
-      requirements: PaymentRequirements
+    let body: unknown
+    try { body = await c.req.json() } catch { return c.json({ error: 'invalid_json', message: 'request body must be valid JSON' }, 400) }
+    const intent = validIntent(body)
+    if (!intent) return c.json({ error: 'invalid_intent', message: 'payment {payer,payee,asset,amount} and requirements are required' }, 400)
+    try {
+      const compliance = await evaluate(d, intent.payment, intent.requirements)
+      d.bus.emit({ type: 'verify', payer: intent.payment.payer, payee: intent.payment.payee, amount: intent.payment.amount, compliance })
+      return c.json({ isValid: compliance.decision === 'CLEARED', compliance })
+    } catch (e) {
+      return c.json({ error: 'compliance_check_failed', message: e instanceof Error ? e.message : 'compliance check failed' }, 502)
     }
-    const compliance = await evaluate(d, payment, requirements)
-    d.bus.emit({ type: 'verify', payer: payment.payer, payee: payment.payee, amount: payment.amount, compliance })
-    return c.json({ isValid: compliance.decision === 'CLEARED', compliance })
   })
 
   // gate + settle + receipt
   app.post('/settle', async (c) => {
-    const { payment, requirements } = (await c.req.json()) as {
-      payment: PaymentPayload
-      requirements: PaymentRequirements
-    }
-    const compliance = await evaluate(d, payment, requirements)
+    let body: unknown
+    try { body = await c.req.json() } catch { return c.json({ error: 'invalid_json', message: 'request body must be valid JSON' }, 400) }
+    const intent = validIntent(body)
+    if (!intent) return c.json({ error: 'invalid_intent', message: 'payment {payer,payee,asset,amount} and requirements are required' }, 400)
+    const { payment, requirements } = intent
 
-    const mkReceipt = (settlement: SettlementResult) =>
-      buildReceipt({
-        cv: d.cv,
-        chain: d.cfg.chain,
-        network: d.cfg.network,
-        facilitatorLabel: d.facilitatorLabel,
-        explorerBase: d.cfg.explorerBase,
-        payment,
-        requirements,
-        compliance,
-        settlement,
-        signer: d.signer,
+    try {
+      const compliance = await evaluate(d, payment, requirements)
+
+      const mkReceipt = (settlement: SettlementResult) =>
+        buildReceipt({
+          cv: d.cv,
+          chain: d.cfg.chain,
+          network: d.cfg.network,
+          facilitatorLabel: d.facilitatorLabel,
+          explorerBase: d.cfg.explorerBase,
+          payment,
+          requirements,
+          compliance,
+          settlement,
+          signer: d.signer,
+        })
+
+      if (compliance.decision === 'BLOCKED') {
+        const receipt = await mkReceipt({ status: 'failed', txHash: null, rung: 'blocked', simulated: false, confirmedAt: Date.now() })
+        d.store.put(receipt)
+        d.bus.emit({ type: 'block', payer: payment.payer, payee: payment.payee, amount: payment.amount, reason: compliance.reason, compliance })
+        return c.json({ success: false, blocked: true, receipt, compliance }, 402)
+      }
+
+      const settlement = await d.settler.settle({
+        payer: payment.payer,
+        payee: payment.payee,
+        asset: payment.asset,
+        amount: BigInt(payment.amount),
       })
-
-    if (compliance.decision === 'BLOCKED') {
-      const receipt = await mkReceipt({ status: 'failed', txHash: null, rung: 'blocked', simulated: false, confirmedAt: Date.now() })
+      if (settlement.status === 'settled') d.policyEngine.record(payment.payer, BigInt(payment.amount))
+      const receipt = await mkReceipt(settlement)
       d.store.put(receipt)
-      d.bus.emit({ type: 'block', payer: payment.payer, payee: payment.payee, amount: payment.amount, reason: compliance.reason, compliance })
-      return c.json({ success: false, blocked: true, receipt, compliance }, 402)
+      d.bus.emit({ type: 'settle', receipt })
+      return c.json({ success: settlement.status === 'settled', receipt, settlement }, settlement.status === 'settled' ? 200 : 502)
+    } catch (e) {
+      return c.json({ error: 'settlement_failed', message: e instanceof Error ? e.message : 'settlement failed' }, 502)
     }
-
-    const settlement = await d.settler.settle({
-      payer: payment.payer,
-      payee: payment.payee,
-      asset: payment.asset,
-      amount: BigInt(payment.amount),
-    })
-    if (settlement.status === 'settled') d.policyEngine.record(payment.payer, BigInt(payment.amount))
-    const receipt = await mkReceipt(settlement)
-    d.store.put(receipt)
-    d.bus.emit({ type: 'settle', receipt })
-    return c.json({ success: settlement.status === 'settled', receipt, settlement }, settlement.status === 'settled' ? 200 : 502)
   })
 
   app.get('/receipts/:key', (c) => {

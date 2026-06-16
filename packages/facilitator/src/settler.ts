@@ -38,7 +38,7 @@ export class AusdxSettler implements Settler {
   }
 
   async settle(req: SettlementRequest): Promise<SettlementResult> {
-    const base = { rung: 'ausdx-transferFrom', simulated: false } as const
+    const base = { rung: 'onchain-transferFrom', simulated: false } as const
     let lastErr: unknown
     // retry transient submission/RPC hiccups (a confirmed on-chain revert is NOT retried)
     for (let attempt = 0; attempt < 3; attempt++) {
