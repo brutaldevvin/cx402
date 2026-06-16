@@ -25,28 +25,28 @@ const transport = (path: string, init: RequestInit) => Promise.resolve(fac.app.r
 const A = privateKeyToAccount(pk('W_PKEY')).address
 const supplier = privateKeyToAccount(pk('W2_PKEY')).address
 const DEAD = '0x000000000000000000000000000000000000dEaD' as const
-const usd = (base?: string) => (base ? '$' + formatUnits(BigInt(base), 6) : '-')
+const usd = (base?: string) => (base ? formatUnits(BigInt(base), 6) + ' aUSDC' : '-')
 
 console.log(`\n${B}cx402 - verified payment intents${X}  ${D}· procurement agent on Monad testnet${X}`)
-console.log(`${D}mandate: budget $50 · max $20/tx · verified counterparties only${X}\n`)
+console.log(`${D}mandate: budget 0.004 · max 0.002/tx aUSDC · verified counterparties only${X}\n`)
 
-const agent = cx402.agent({ address: A, policy: { budget: '50', maxPerTx: '20' }, transport })
+const agent = cx402.agent({ address: A, policy: { budget: '0.004', maxPerTx: '0.002' }, transport })
 await agent.init()
 
 const steps = [
-  { payee: supplier, amount: '15', purpose: 'market-data feed' },
-  { payee: supplier, amount: '10', purpose: 'inference credits' },
-  { payee: DEAD,     amount: '5',  purpose: 'unknown seller agent' },
-  { payee: supplier, amount: '30', purpose: 'bulk data order' },
-  { payee: supplier, amount: '20', purpose: 'storage' },
-  { payee: supplier, amount: '10', purpose: 'more compute' },
+  { payee: supplier, amount: '0.001', purpose: 'market-data feed' },
+  { payee: supplier, amount: '0.001', purpose: 'inference credits' },
+  { payee: DEAD,     amount: '0.001', purpose: 'unknown seller agent' },
+  { payee: supplier, amount: '0.005', purpose: 'bulk data order' },
+  { payee: supplier, amount: '0.001', purpose: 'storage' },
+  { payee: supplier, amount: '0.002', purpose: 'more compute' },
 ] as const
 
 let i = 0
 for (const s of steps) {
   i++
   const who = s.payee === DEAD ? `${s.payee.slice(0, 8)}…` : `supplier ${supplier.slice(0, 8)}…`
-  process.stdout.write(`${D}[${i}]${X} pay ${B}$${s.amount}${X} → ${who}  ${D}(${s.purpose})${X}\n`)
+  process.stdout.write(`${D}[${i}]${X} pay ${B}${s.amount} aUSDC${X} → ${who}  ${D}(${s.purpose})${X}\n`)
   const r = await agent.pay({ payee: s.payee, amount: s.amount, purpose: s.purpose })
   if (r.ok) {
     const remaining = (r.receipt.compliance as { checks?: { policy?: { remaining?: string } } }).checks?.policy?.remaining
@@ -56,4 +56,4 @@ for (const s of steps) {
     console.log(`    ${R}✗ BLOCKED${X} by ${by}  ${D}· ${r.reason}${X}\n`)
   }
 }
-console.log(`${D}every cleared payment moved real aUSDx on Monad and emitted a signed Travel-Rule receipt.${X}\n`)
+console.log(`${D}every cleared payment moved real aUSDC on Monad and emitted a signed Travel-Rule receipt.${X}\n`)

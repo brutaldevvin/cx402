@@ -30,13 +30,13 @@ live('cx402 Agent SDK - E2E (Monad)', () => {
   let agent: Cx402Agent
 
   beforeAll(async () => {
-    // operator gives the agent a mandate: max $5 per payment
-    agent = cx402.agent({ address: A, policy: { maxPerTx: '5' }, transport })
+    // operator gives the agent a mandate: max 0.002 aUSDC per payment
+    agent = cx402.agent({ address: A, policy: { maxPerTx: '0.002' }, transport })
     await agent.init()
   })
 
   it('pays a verified supplier within mandate → verified receipt + on-chain tx', async () => {
-    const r = await agent.pay({ payee: B, amount: '1', purpose: 'market-data feed' })
+    const r = await agent.pay({ payee: B, amount: '0.001', purpose: 'market-data feed' })
     expect(r.ok).toBe(true)
     if (r.ok) {
       expect(r.receipt.compliance.status).toBe('CLEARED')
@@ -46,13 +46,13 @@ live('cx402 Agent SDK - E2E (Monad)', () => {
   })
 
   it('refuses an unverified supplier → blocked by identity', async () => {
-    const r = await agent.pay({ payee: DEAD, amount: '1', purpose: 'sketchy seller' })
+    const r = await agent.pay({ payee: DEAD, amount: '0.001', purpose: 'sketchy seller' })
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.blockedBy).toBe('identity')
   })
 
   it('refuses a payment over the mandate cap → blocked by policy', async () => {
-    const r = await agent.pay({ payee: B, amount: '10', purpose: 'too big' }) // over maxPerTx 5
+    const r = await agent.pay({ payee: B, amount: '0.005', purpose: 'too big' }) // over maxPerTx 0.002
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.blockedBy).toBe('policy')

@@ -37,11 +37,11 @@ live('cx402 facilitator (live Monad)', () => {
 
   const requirements = (payTo: string): PaymentRequirements => ({
     scheme: 'exact', network: cfg.network, asset: cfg.settlementAsset, payTo: payTo as `0x${string}`,
-    maxAmountRequired: parseUnits('1', 6).toString(), resource: '/premium', description: 'demo',
+    maxAmountRequired: parseUnits('0.001', 6).toString(), resource: '/premium', description: 'demo',
   })
   const payment = (payee: string): PaymentPayload => ({
     scheme: 'exact', network: cfg.network, payer: A, payee: payee as `0x${string}`,
-    asset: cfg.settlementAsset, amount: parseUnits('1', 6).toString(),
+    asset: cfg.settlementAsset, amount: parseUnits('0.001', 6).toString(),
   })
   const post = (path: string, body: unknown) =>
     app.request(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
@@ -65,7 +65,7 @@ live('cx402 facilitator (live Monad)', () => {
     expect(body.compliance.reason).toBe('payee_no_apass')
   })
 
-  it('POST /settle - A -> B settles on-chain, signs a receipt, moves aUSDx', async () => {
+  it('POST /settle - A -> B settles on-chain, signs a receipt, moves aUSDC', async () => {
     if (cfg.settlementMode !== 'ausdx') return // requires setup (facilitator funded + approved)
     const before = await balOf(B)
     const events: EmittedEvent[] = []
@@ -82,7 +82,7 @@ live('cx402 facilitator (live Monad)', () => {
     expect(body.receipt.beneficiary.cvRecordId).toBeTruthy()
     expect(body.receipt.signature?.value).toMatch(/^0x/)
     expect(events.some((e) => e.type === 'settle')).toBe(true)
-    expect((await balOf(B)) - before).toBe(parseUnits('1', 6))
+    expect((await balOf(B)) - before).toBe(parseUnits('0.001', 6))
 
     const got = (await (await app.request(`/receipts/${body.receipt.id}`)).json()) as { id: string }
     expect(got.id).toBe(body.receipt.id)

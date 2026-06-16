@@ -34,7 +34,7 @@ Public on-chain values (safe to paste as-is):
 | `NETWORK` | `eip155:10143` |
 | `CHAIN_ID` | `10143` |
 | `SETTLEMENT_MODE` | `ausdx` |
-| `SETTLEMENT_ASSET` | `0xcd94fa2bb8743b4a8c8cd625bdaf705fe80a4f29` |
+| `SETTLEMENT_ASSET` | `0xaC0893567D43C3E7e6e35a72803df05416C1f20D` (real aUSDC) |
 | `AUSDC_ADDRESS` | `0xaC0893567D43C3E7e6e35a72803df05416C1f20D` |
 | `APASS_ADDRESS` | `0xbA82D189540CaC9DC6FF46B6837CaC1BFdEC58B9` |
 | `EXPLORER_BASE` | `https://testnet.monadscan.com/tx/` |
@@ -56,5 +56,6 @@ Notes:
   approval, so the buyer's key never leaves your machine.
 - Without `FACILITATOR_PKEY` the server falls back to simulated settlement (no
   real transactions). Set it for the live on-chain demo.
-- The facilitator wallet only holds testnet gas and can move the buyer's
-  pre-approved testnet aUSDx. Defund or rotate it after judging.
+- The live demo settles real aUSDC at 0.001 per cleared payment. The facilitator
+  wallet only holds testnet gas and can move the buyer's pre-approved testnet
+  aUSDC. Defund or rotate it after judging.

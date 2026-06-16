@@ -51,7 +51,7 @@
   .panel{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:22px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4);align-self:start;position:sticky;top:90px}
   .panel h3{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:16px}
   .fld{margin-bottom:14px}.fld label{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin-bottom:5px}
-  .fld .pre{position:relative}.fld .pre:before{content:'$';position:absolute;left:12px;top:10px;color:var(--mut);font-family:'JetBrains Mono',monospace}
+  .fld .pre{position:relative}.fld .pre:before{content:'';position:absolute;left:12px;top:10px;color:var(--mut);font-family:'JetBrains Mono',monospace}
   .fld input{width:100%;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:10px 12px 10px 22px}
   .fld.plain input{padding-left:12px}
   .rules{list-style:none;margin:14px 0 0;padding:0}
@@ -127,7 +127,7 @@
       <div class="heror">
         <div class="cbox"><span class="ci">◆</span><div class="ct">A-Pass identity</div><div class="cd">both parties verified against the live registry</div></div>
         <div class="cbox"><span class="ci">◆</span><div class="ct">policy mandate</div><div class="cd">budget, caps and rules the agent obeys</div></div>
-        <div class="cbox"><span class="ci">◆</span><div class="ct">on-chain settlement</div><div class="cd">real aUSDx and aUSDC, live on Monad</div></div>
+        <div class="cbox"><span class="ci">◆</span><div class="ct">on-chain settlement</div><div class="cd">real aUSDC, live on Monad</div></div>
         <div class="cbox"><span class="ci">◆</span><div class="ct">verified receipt</div><div class="cd">signed, auditable, no personal data</div></div>
       </div>
     </div>
@@ -144,16 +144,16 @@
   <section id="live">
     <div class="eyebrow reveal">try it · live on monad</div>
     <h2 class="h2 reveal">Set a mandate. Run the agent. Watch it get governed.</h2>
-    <p class="body reveal">The real facilitator. Set the agent's budget and per-payment cap, then run a procurement session. Verified, in-policy payments settle on-chain; everything else is refused, by identity or by policy. <span style="color:var(--mut)">The interactive run settles a stand-in A-Token so you can run it freely; the identical flow is proven on real aUSDC above.</span></p>
+    <p class="body reveal">The real facilitator. Set the agent's budget and per-payment cap, then run a procurement session. Verified, in-policy payments settle on-chain; everything else is refused, by identity or by policy. <span style="color:var(--mut)">The interactive run settles real aUSDC on Monad in tiny amounts (0.001 per cleared payment), so every cleared receipt links to a real transaction.</span></p>
     <div class="live">
       <div class="panel reveal">
         <h3>agent mandate</h3>
-        <div class="fld"><label>weekly budget</label><div class="pre"><input id="budget" value="50"></div></div>
-        <div class="fld"><label>max per payment</label><div class="pre"><input id="maxtx" value="20"></div></div>
+        <div class="fld"><label>weekly budget</label><div class="pre"><input id="budget" value="0.004"></div></div>
+        <div class="fld"><label>max per payment</label><div class="pre"><input id="maxtx" value="0.002"></div></div>
         <div class="fld plain"><label>min counterparty tier</label><input id="mintier" value="1"></div>
         <div class="note"><span class="ok">●</span> counterparties: verified A-Pass, or an allow-list</div>
         <button class="runbtn" id="run">▶ run procurement agent</button>
-        <div class="meter"><div class="top"><span>budget</span><span id="bleft">$50.00 left</span></div><div class="bar"><i id="bbar"></i></div></div>
+        <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
       </div>
       <div class="ledger" id="ledger"></div>
     </div>
@@ -181,7 +181,7 @@
       <div class="seg"><span class="spark"></span></div>
       <div class="node on"><span class="nt">cx402</span>verify · policy · settle</div>
       <div class="seg"><span class="spark"></span></div>
-      <div class="node"><span class="nt">MONAD</span>aUSDx / aUSDC</div>
+      <div class="node"><span class="nt">MONAD</span>aUSDC</div>
     </div>
   </section>
 
@@ -254,18 +254,18 @@ const A='0x03681955065AF6EA51660dd63e7634fd0dE4d0a8',SUP='0xBe58C5eE13bE6a4aD8C9
 const EXPLORER='https://testnet.monadscan.com/tx/';
 const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
 let ASSET,NETWORK;
-const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>'$'+(Number(b)/1e6).toFixed(2),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
 $('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;
 $('#h1').innerHTML='The compliant version of x402.'.split(' ').map((w,i)=>{const d=w.endsWith('.')?'<span class="d">.</span>':'';return `<span style="animation-delay:${.12+i*.1}s">${w.replace('.','')}${d}</span>`}).join(' ');
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
 const TX=[
-  {a:'$1.00 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd'},
-  {a:'$15.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xfdec2aadb77dcc13875b95f9fca2be03b21ddd1230121a887a8d949fbdec3488'},
-  {a:'$30.00',to:'supplier',st:'BLOCKED · policy',c:'am'},
-  {a:'$10.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xa19fda4e65818f47c148502c5ed3c6633c1a14baca90ddff8ec421c7b5fd49a1'},
-  {a:'$5.00',to:'unknown seller',st:'BLOCKED · identity',c:'rd'},
-  {a:'$20.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xe78cc4976c3fca482c0373043b734d514e399263eeb112a32cb4a76449932701'},
+  {a:'0.001 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xddaa7a3ac684a479f30dc8c8ea29524e1c27367f1778d8c140034a849929fc36'},
+  {a:'0.001 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xedfa58eef84cc5a411e3dab49f1eeacafb7240e8402607b54f803f168e38c9f6'},
+  {a:'0.005 aUSDC',to:'supplier',st:'BLOCKED · policy',c:'am'},
+  {a:'0.001 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xa62713d4a811b1ea34e256a08829ed2c76cd519ac3abd10e6378afb8b086b2f1'},
+  {a:'0.001 aUSDC',to:'unknown seller',st:'BLOCKED · identity',c:'rd'},
+  {a:'0.001 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xddaa7a3ac684a479f30dc8c8ea29524e1c27367f1778d8c140034a849929fc36'},
 ];
 $('#ticker').innerHTML=(()=>{const s=TX.map(x=>{const inner=`● <b>${x.a}</b> <span class="d">→ ${x.to}</span> · <span class="${x.c}">${x.st}</span>${x.h?' ↗':''}`;return x.h?`<a class="it" href="${EXPLORER}${x.h}" target="_blank" style="color:inherit;text-decoration:none">${inner}</a>`:`<span class="it">${inner}</span>`}).join('');return s+s})();
 
@@ -273,18 +273,17 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
 const STEPS=[
-  {payee:SUP,amount:'15',purpose:'market-data feed'},{payee:SUP,amount:'10',purpose:'inference credits'},
-  {payee:DEAD,amount:'5',purpose:'unknown seller agent'},{payee:SUP,amount:'30',purpose:'bulk data order'},
-  {payee:SUP,amount:'20',purpose:'storage'},{payee:SUP,amount:'10',purpose:'more compute'},
+  {payee:SUP,amount:'0.001',purpose:'market-data feed'},{payee:SUP,amount:'0.001',purpose:'inference credits'},
+  {payee:DEAD,amount:'0.001',purpose:'unknown seller agent'},{payee:SUP,amount:'0.005',purpose:'bulk data order'},
+  {payee:SUP,amount:'0.001',purpose:'storage'},{payee:SUP,amount:'0.002',purpose:'more compute'},
 ];
 // seed the ledger with real prior settlements so it's never empty
 const SEED=[
-  {amount:'1',payee:SUP,status:'cleared',tx:PROOFTX,purpose:'real aUSDC'},
-  {amount:'15',payee:SUP,status:'cleared',tx:'0xfdec2aadb77dcc13875b95f9fca2be03b21ddd1230121a887a8d949fbdec3488'},
-  {amount:'10',payee:SUP,status:'cleared',tx:'0xa19fda4e65818f47c148502c5ed3c6633c1a14baca90ddff8ec421c7b5fd49a1'},
-  {amount:'5',payee:DEAD,status:'identity',reason:'payee_no_apass'},
-  {amount:'30',payee:SUP,status:'policy',reason:'over_max_per_tx'},
-  {amount:'20',payee:SUP,status:'cleared',tx:'0xe78cc4976c3fca482c0373043b734d514e399263eeb112a32cb4a76449932701'},
+  {amount:'0.001',payee:SUP,status:'cleared',tx:'0xddaa7a3ac684a479f30dc8c8ea29524e1c27367f1778d8c140034a849929fc36',purpose:'market-data feed'},
+  {amount:'0.001',payee:SUP,status:'cleared',tx:'0xedfa58eef84cc5a411e3dab49f1eeacafb7240e8402607b54f803f168e38c9f6',purpose:'inference credits'},
+  {amount:'0.001',payee:SUP,status:'cleared',tx:'0xa62713d4a811b1ea34e256a08829ed2c76cd519ac3abd10e6378afb8b086b2f1',purpose:'storage'},
+  {amount:'0.001',payee:DEAD,status:'identity',reason:'payee_no_apass',purpose:'unknown seller agent'},
+  {amount:'0.005',payee:SUP,status:'policy',reason:'over_max_per_tx',purpose:'bulk data order'},
 ];
 const short=a=>a.slice(0,6)+'…'+a.slice(-4);
 function build(d){
@@ -296,7 +295,7 @@ function build(d){
   el.innerHTML=`<div class="rt"><span>cx402 · receipt</span><span>${d.purpose||'payment'}</span></div>
    <div class="row"><span class="k">originator</span><span><b>${short(A)}</b> <span class="bl">a-pass ✓</span></span></div>
    <div class="row"><span class="k">beneficiary</span><span>${benef}</span></div>
-   <div class="row"><span class="k">amount</span><b>$${d.amount} ${d.purpose==='real aUSDC'?'aUSDC':'aUSDx'}</b></div>${tail}
+   <div class="row"><span class="k">amount</span><b>${d.amount} aUSDC</b></div>${tail}
    <div class="rd"></div><div class="st"><span class="k">status</span><span class="stamp">${stamp}</span></div>`;
   return el;
 }

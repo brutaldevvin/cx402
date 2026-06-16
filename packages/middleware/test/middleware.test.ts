@@ -30,7 +30,7 @@ live('cx402 merchant middleware (paywall, live Monad)', () => {
 
   // a tiny 402-protected shop - one line of middleware
   const shop = new Hono()
-  shop.use('/premium', cx402Paywall({ price: '1', payTo: B, transport }))
+  shop.use('/premium', cx402Paywall({ price: '0.001', payTo: B, transport }))
   shop.get('/premium', (c) => c.json({ data: 'premium market-data feed' }))
 
   it('no payment → 402 challenge with the required compliant payment', async () => {
@@ -38,13 +38,13 @@ live('cx402 merchant middleware (paywall, live Monad)', () => {
     expect(res.status).toBe(402)
     const body = (await res.json()) as { accepts: Array<{ payTo: string; maxAmountRequired: string }> }
     expect(body.accepts[0]!.payTo.toLowerCase()).toBe(B.toLowerCase())
-    expect(body.accepts[0]!.maxAmountRequired).toBe(parseUnits('1', 6).toString())
+    expect(body.accepts[0]!.maxAmountRequired).toBe(parseUnits('0.001', 6).toString())
   })
 
   it('valid payment → settles, serves the resource, returns the receipt', async () => {
     const payment = {
       scheme: 'exact', network: cfg.network, payer: A, payee: B,
-      asset: cfg.settlementAsset, amount: parseUnits('1', 6).toString(),
+      asset: cfg.settlementAsset, amount: parseUnits('0.001', 6).toString(),
     }
     const xpay = Buffer.from(JSON.stringify(payment)).toString('base64')
     const res = await shop.request('/premium', { headers: { 'X-PAYMENT': xpay } })

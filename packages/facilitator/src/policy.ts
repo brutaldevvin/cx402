@@ -37,7 +37,9 @@ export class PolicyEngine {
   register(agent: Address, policy: Policy): void {
     const k = agent.toLowerCase()
     this.policies.set(k, policy)
-    if (!this.spent.has(k)) this.spent.set(k, 0n)
+    // a freshly registered mandate starts a fresh session: reset running spend so
+    // the budget depletes within a session, not permanently across registrations
+    this.spent.set(k, 0n)
   }
 
   get(agent: Address): Policy | undefined {
