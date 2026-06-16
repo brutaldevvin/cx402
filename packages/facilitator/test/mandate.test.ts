@@ -61,8 +61,8 @@ const cfg = loadFacilitatorConfig()
 const httpReady = cfg.settlementAsset && cfg.rpcUrl ? describe : describe.skip
 
 httpReady('POST /policy mandate gating', () => {
-  const post = (app: { request: (p: string, i: RequestInit) => Promise<Response> }, body: unknown) =>
-    app.request('/policy', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+  const post = (app: { request: (p: string, i: RequestInit) => Response | Promise<Response> }, body: unknown) =>
+    Promise.resolve(app.request('/policy', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }))
 
   it('accepts a signed mandate over HTTP', async () => {
     const { app } = createFacilitator(cfg)
