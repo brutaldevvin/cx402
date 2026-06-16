@@ -6,11 +6,11 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--paper:#F4EEDD;--card:#FFFDF8;--ink:#16140f;--ink2:#3a352a;--mut:#8a8475;--line:#cfc8b6;--edge:#e3ddcd;
-    --char:#26231c;--char2:#2f2b22;--green:#0a9a45;--green2:#0AF668;--red:#d8281f;--blue:#3f63d6;--amber:#b6822a;--bg:#657b69;--on:#f3eede}
+    --char:#26231c;--char2:#2f2b22;--green:#0a9a45;--green2:#0AF668;--red:#d8281f;--blue:#3f63d6;--amber:#b6822a}
   html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   .mono{font-family:'JetBrains Mono',monospace}
-  .bg{position:fixed;inset:-40px;z-index:0;pointer-events:none;opacity:.55;background-image:linear-gradient(#a8c2b04d 1px,transparent 1px),linear-gradient(90deg,#a8c2b04d 1px,transparent 1px);background-size:46px 46px;animation:drift 28s linear infinite}
+  .bg{position:fixed;inset:-40px;z-index:0;pointer-events:none;opacity:.5;background-image:linear-gradient(#657b6936 1px,transparent 1px),linear-gradient(90deg,#657b6936 1px,transparent 1px);background-size:46px 46px;animation:drift 28s linear infinite}
   @keyframes drift{to{transform:translate(46px,46px)}}
   main{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 30px}
   nav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;margin:14px auto 0;max-width:1140px;padding:13px 30px;background:var(--ink);border-radius:4px;transform:skewX(-9deg)}
@@ -18,7 +18,7 @@
   nav .wm{font-weight:800;letter-spacing:-.04em;font-size:19px;color:var(--card)}.wm .d{color:var(--green2)}
   nav a{font-family:'JetBrains Mono',monospace;font-size:12px;color:#c9c2b0;text-decoration:none;margin-left:20px}nav a:hover{color:var(--card)}
   .ticker{overflow:hidden;border-bottom:1px dashed var(--line);margin-top:12px;white-space:nowrap}
-  .ticker .run{display:inline-block;padding:8px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--on);animation:tick 40s linear infinite}
+  .ticker .run{display:inline-block;padding:8px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);animation:tick 40s linear infinite}
   .ticker .it{margin:0 24px}.gd{color:var(--green)}.rd{color:var(--red)}.am{color:var(--amber)}.d{color:var(--mut)}.bl{color:var(--blue)}
   @keyframes tick{to{transform:translateX(-50%)}}
 
@@ -27,7 +27,7 @@
   .h1{font-weight:800;letter-spacing:-.035em;line-height:1.02;font-size:54px}.h1 .d{color:var(--green)}
   .h1 span{display:inline-block;opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
   @keyframes rise{to{opacity:1;transform:none}}
-  .lead{font-size:18px;line-height:1.55;color:var(--on);margin-top:18px;opacity:0;animation:rise .6s ease .5s forwards}
+  .lead{font-size:18px;line-height:1.55;color:var(--ink2);margin-top:18px;opacity:0;animation:rise .6s ease .5s forwards}
   .heror{display:grid;grid-template-columns:1fr 1fr;gap:13px;opacity:0;animation:rise .6s ease .65s forwards}
   .cbox{background:linear-gradient(160deg,var(--char2),var(--char));border:1px solid #3a3327;border-radius:11px;padding:18px 18px;box-shadow:0 18px 40px -26px rgba(20,16,8,.7)}
   .cbox .ci{color:var(--green2);font-size:12px}
@@ -47,11 +47,11 @@
   .prow .pk{color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
   .prow .pv{color:var(--ink);text-align:right}.prow .pv a{color:inherit;text-decoration:none}.prow .pv a:hover{text-decoration:underline}
   .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
-  .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--on);margin-top:14px;line-height:2}.endpoints a{color:var(--on);text-decoration:underline}.endpoints a:hover{color:var(--green2)}
-  .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px;color:var(--on)}.hook .d{color:var(--green2)}
+  .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:14px;line-height:2}.endpoints a{color:var(--ink2);text-decoration:none}.endpoints a:hover{color:var(--green)}
+  .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px}.hook .d{color:var(--green)}
   .hstrip{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
   .hsig{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);background:var(--card);border:1px solid var(--edge);border-radius:30px;padding:7px 14px;text-decoration:none;white-space:nowrap}
-  .hsig.ok{color:var(--green);border-color:#0a9a4540;background:var(--card)}
+  .hsig.ok{color:var(--green);border-color:#0a9a4540;background:#0a9a450c}
   .herodemo{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:22px;align-items:start}
   .hdleft{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:20px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4)}
   .hflds{display:flex;gap:12px;margin-bottom:14px}.hflds label{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut)}
@@ -60,9 +60,9 @@
   @media(max-width:860px){.herodemo{grid-template-columns:1fr}}
 
   section{padding:46px 0;border-top:1px dashed var(--line)}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green2)}
-  .h2{font-weight:700;letter-spacing:-.02em;font-size:33px;line-height:1.1;margin-top:11px;color:var(--on)}
-  .body{font-size:16px;line-height:1.6;color:var(--on);max-width:620px;margin-top:12px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
+  .h2{font-weight:700;letter-spacing:-.02em;font-size:33px;line-height:1.1;margin-top:11px}
+  .body{font-size:16px;line-height:1.6;color:var(--ink2);max-width:620px;margin-top:12px}
   .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
 
   .live{display:grid;grid-template-columns:320px 1fr;gap:24px;margin-top:26px}
@@ -126,7 +126,7 @@
   .seg:nth-child(2) .spark{animation-delay:0s}.seg:nth-child(4) .spark{animation-delay:.6s}.seg:nth-child(6) .spark{animation-delay:1.2s}
   @keyframes srun{from{left:-4px;opacity:0}10%{opacity:1}90%{opacity:1}to{left:calc(100% - 3px);opacity:0}}
 
-  footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--on)}
+  footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)}
   .btn{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--card);background:var(--ink);border-radius:30px;padding:13px 24px;text-decoration:none;transition:transform .2s}.btn:hover{transform:translateY(-2px)}
   @media(max-width:860px){.herogrid,.live,.anat,.codewrap{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.panel{position:static}}
 </style></head>
@@ -180,7 +180,7 @@
       <div class="prow"><span class="pk">payment intent</span><span class="pv" id="p-intent">-</span></div>
     </div>
     <div class="endpoints reveal">verify it yourself: <a href="/health" target="_blank">/health</a> · <a href="/supported" target="_blank">/supported</a> · <a href="/premium" target="_blank">/premium</a> · <a href="/proof/mandate" target="_blank">/proof/mandate</a> · <a href="/proof/payment-intent" target="_blank">/proof/payment-intent</a></div>
-    <p class="body reveal" style="font-size:13px;color:#d8d2c1;margin-top:16px">For demo reliability the interactive run settles via a pre-approved testnet allowance, after enforcing Cleanverse identity and the signed mandate before any funds move. The signed payment intent above is x402's production per-payment authorization, real and provable, not hidden.</p>
+    <p class="body reveal" style="font-size:13px;color:var(--mut);margin-top:16px">For demo reliability the interactive run settles via a pre-approved testnet allowance, after enforcing Cleanverse identity and the signed mandate before any funds move. The signed payment intent above is x402's production per-payment authorization, real and provable, not hidden.</p>
   </section>
 
   <!-- HOW -->
