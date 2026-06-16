@@ -1,0 +1,22 @@
+{
+  "name": "@cx402/facilitator",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "cx402 — the compliant x402 facilitator: A-Pass gate + A-Token settlement + Travel-Rule receipt.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cx402/cleanverse": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.6.14",
+    "viem": "^2.52.2"
+  }
+}

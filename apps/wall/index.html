@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>cx402 · verified payment intents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--paper:#F4F2EC;--card:#FFFDF8;--ink:#16140f;--ink2:#3a352a;--mut:#8a8475;--line:#cfc8b6;--edge:#e3ddcd;
+    --char:#26231c;--char2:#2f2b22;--green:#0a9a45;--green2:#0AF668;--red:#d8281f;--blue:#3f63d6;--amber:#b6822a}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .bg{position:fixed;inset:-40px;z-index:0;pointer-events:none;opacity:.4;background-image:linear-gradient(#0000000a 1px,transparent 1px),linear-gradient(90deg,#0000000a 1px,transparent 1px);background-size:46px 46px;animation:drift 28s linear infinite}
+  @keyframes drift{to{transform:translate(46px,46px)}}
+  main{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 30px}
+  nav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;margin:14px auto 0;max-width:1140px;padding:12px 22px;background:#fffdf8e0;backdrop-filter:blur(8px);border:1px solid var(--edge);border-radius:40px}
+  nav .wm{font-weight:800;letter-spacing:-.04em;font-size:19px}.wm .d{color:var(--green)}
+  nav a{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);text-decoration:none;margin-left:20px}nav a:hover{color:var(--ink)}
+  .ticker{overflow:hidden;border-bottom:1px dashed var(--line);margin-top:12px;white-space:nowrap}
+  .ticker .run{display:inline-block;padding:8px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);animation:tick 40s linear infinite}
+  .ticker .it{margin:0 24px}.gd{color:var(--green)}.rd{color:var(--red)}.am{color:var(--amber)}.d{color:var(--mut)}.bl{color:var(--blue)}
+  @keyframes tick{to{transform:translateX(-50%)}}
+
+  .hero{padding:46px 0 14px}
+  .herogrid{display:grid;grid-template-columns:1.22fr .9fr;gap:38px;align-items:center}
+  .h1{font-weight:800;letter-spacing:-.035em;line-height:1.02;font-size:54px}.h1 .d{color:var(--green)}
+  .h1 span{display:inline-block;opacity:0;transform:translateY(14px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .lead{font-size:18px;line-height:1.55;color:var(--ink2);margin-top:18px;opacity:0;animation:rise .6s ease .5s forwards}
+  .heror{display:grid;grid-template-columns:1fr 1fr;gap:13px;opacity:0;animation:rise .6s ease .65s forwards}
+  .cbox{background:linear-gradient(160deg,var(--char2),var(--char));border:1px solid #3a3327;border-radius:11px;padding:18px 18px;box-shadow:0 18px 40px -26px rgba(20,16,8,.7)}
+  .cbox .ci{color:var(--green2);font-size:12px}
+  .cbox .ct{font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:500;margin-top:9px;color:#fdfcf8}
+  .cbox .cd{font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39a87;margin-top:6px;line-height:1.45}
+
+  .proof{display:flex;flex-wrap:wrap;margin-top:30px;border:1px solid var(--edge);border-radius:10px;overflow:hidden;background:var(--card)}
+  .proof div{flex:1;min-width:150px;padding:16px 20px;border-right:1px solid var(--edge)}.proof div:last-child{border-right:none}
+  .proof .n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;letter-spacing:-.02em}
+  .proof .l{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-top:5px}
+  .proof .g{color:var(--green)}
+  .ausdcproof{display:inline-flex;align-items:center;gap:9px;margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink2);text-decoration:none;border:1px solid #0a9a4540;background:#0a9a450c;border-radius:30px;padding:9px 16px}
+  .ausdcproof:hover{border-color:var(--green)}.ausdcproof .c{color:var(--green);font-weight:700}.ausdcproof b{color:var(--ink)}
+
+  section{padding:46px 0;border-top:1px dashed var(--line)}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
+  .h2{font-weight:700;letter-spacing:-.02em;font-size:33px;line-height:1.1;margin-top:11px}
+  .body{font-size:16px;line-height:1.6;color:var(--ink2);max-width:620px;margin-top:12px}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
+
+  .live{display:grid;grid-template-columns:320px 1fr;gap:24px;margin-top:26px}
+  .panel{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:22px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4);align-self:start;position:sticky;top:90px}
+  .panel h3{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:16px}
+  .fld{margin-bottom:14px}.fld label{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin-bottom:5px}
+  .fld .pre{position:relative}.fld .pre:before{content:'$';position:absolute;left:12px;top:10px;color:var(--mut);font-family:'JetBrains Mono',monospace}
+  .fld input{width:100%;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:10px 12px 10px 22px}
+  .fld.plain input{padding-left:12px}
+  .rules{list-style:none;margin:14px 0 0;padding:0}
+  .rules li{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink2);padding:7px 0;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between;gap:12px}
+  .rules li:last-child{border:none}.rules .r{color:var(--mut)}
+  .note{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);display:flex;align-items:center;gap:6px;margin:2px 0 16px}.note .ok{color:var(--blue)}
+  .runbtn{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--card);background:var(--ink);border:none;border-radius:8px;padding:13px;cursor:pointer;transition:transform .15s}
+  .runbtn:hover{transform:translateY(-1px)}.runbtn:disabled{opacity:.5;cursor:default}
+  .meter{margin-top:18px}.meter .top{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);margin-bottom:6px}
+  .bar{height:8px;background:var(--paper);border:1px solid var(--edge);border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green);width:100%;transition:width .5s ease}
+
+  .ledger{display:flex;flex-direction:column;gap:12px}
+  .rc{background:var(--card);border:1px solid var(--edge);border-radius:4px;box-shadow:0 12px 32px -22px rgba(40,34,20,.4);padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink2);line-height:1.9;clip-path:inset(0 0 100% 0);opacity:0;transition:clip-path .5s cubic-bezier(.2,.7,.2,1),opacity .4s}
+  .rc.in{clip-path:inset(0 0 0 0);opacity:1}
+  .rc .rt{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:6px}
+  .rc .row{display:flex;justify-content:space-between}.rc b{color:var(--ink);font-weight:500}.rc .k{color:var(--mut)}
+  .rc .rd{border-top:1px dashed var(--line);margin:7px 0 5px}
+  .rc .st{display:flex;justify-content:space-between;align-items:center}.rc .stamp{font-size:15px;font-weight:700;letter-spacing:.1em}
+  .rc.cleared{border-left:3px solid var(--green)}.rc.cleared .stamp{color:var(--green)}
+  .rc.identity{border-left:3px solid var(--red)}.rc.identity .stamp{color:var(--red)}
+  .rc.policy{border-left:3px solid var(--amber)}.rc.policy .stamp{color:var(--amber)}
+  .rc a{color:var(--blue);text-decoration:none}.rc a:hover{text-decoration:underline}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:22px}
+  .card{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:24px}
+  .card .cl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+  .card h4{font-size:18px;font-weight:600;margin-bottom:7px}.card p{font-size:14px;color:var(--ink2);line-height:1.55}
+
+  .anat{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;margin-top:26px}
+  .annot{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5;color:var(--ink2)}
+  .annot .a{padding:13px 0;border-bottom:1px dashed var(--line);display:flex;gap:12px}.annot .a:last-child{border:none}.annot .a .t{color:var(--ink);font-weight:500;min-width:120px}
+
+  .codewrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;align-items:start}
+  pre{background:#1c1a14;color:#ece7da;border-radius:8px;padding:22px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;overflow-x:auto}
+  pre .c{color:#8a8475}pre .g{color:#7fd99b}pre .b{color:#9bb4ff}
+  .pkgs{font-family:'JetBrains Mono',monospace;font-size:13px}
+  .pkgs .p{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line)}.pkgs .p:last-child{border:none}
+  .pkgs .nm{color:var(--ink);font-weight:500;min-width:180px}.pkgs .ds{color:var(--mut)}
+  .tk{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+  .tkcard{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:26px;display:flex;flex-direction:column}
+  .tkcard .role{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+  .tkcard h4{font-size:20px;font-weight:600;margin-bottom:8px}
+  .tkcard p{font-size:14.5px;color:var(--ink2);line-height:1.55;margin-bottom:18px;flex:1}
+  .tkcode{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#1c1a14;color:#ece7da;border-radius:7px;padding:14px 16px;white-space:pre;overflow-x:auto;line-height:1.7}
+  .tkcode .b{color:#9bb4ff}.tkcode .g{color:#7fd99b}
+  .tkcaption{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);margin-top:8px}
+  .tkunder{margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);text-align:center;letter-spacing:.04em}
+
+  .rail{display:flex;align-items:center;justify-content:space-between;margin-top:26px;background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:30px 28px}
+  .node{font-family:'JetBrains Mono',monospace;font-size:12.5px;text-align:center;color:var(--ink2);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:13px 16px;min-width:130px}
+  .node .nt{color:var(--ink);font-weight:500;display:block;margin-bottom:3px}.node.on{border-color:var(--green);box-shadow:0 0 0 1px #0a9a4533}.node.on .nt{color:var(--green)}
+  .seg{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 5px,transparent 5px 10px);position:relative;margin:0 6px}
+  .spark{position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:var(--green);transform:translateY(-50%);box-shadow:0 0 10px #0a9a4588;animation:srun 1.8s linear infinite}
+  .seg:nth-child(2) .spark{animation-delay:0s}.seg:nth-child(4) .spark{animation-delay:.6s}.seg:nth-child(6) .spark{animation-delay:1.2s}
+  @keyframes srun{from{left:-4px;opacity:0}10%{opacity:1}90%{opacity:1}to{left:calc(100% - 3px);opacity:0}}
+
+  footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)}
+  .btn{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--card);background:var(--ink);border-radius:30px;padding:13px 24px;text-decoration:none;transition:transform .2s}.btn:hover{transform:translateY(-2px)}
+  @media(max-width:860px){.herogrid,.live,.anat,.codewrap{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.panel{position:static}}
+</style></head>
+<body>
+<div class="bg"></div>
+<nav><div class="wm">cx402<span class="d">.</span></div><div><a href="#live">try it</a><a href="#how">how</a><a href="#receipt">receipt</a><a href="#build">build</a></div></nav>
+<div class="ticker"><div class="run" id="ticker"></div></div>
+
+<main>
+  <div class="hero">
+    <div class="herogrid">
+      <div>
+        <h1 class="h1" id="h1"></h1>
+        <p class="lead">A compliance toolkit for agent payments. Give an AI agent a wallet and a <b>mandate</b>, and it pays only when the counterparty is <b>verified</b> and the payment is <b>within policy</b>. Powered by Cleanverse, settled on Monad.</p>
+      </div>
+      <div class="heror">
+        <div class="cbox"><span class="ci">◆</span><div class="ct">A-Pass identity</div><div class="cd">both parties verified against the live registry</div></div>
+        <div class="cbox"><span class="ci">◆</span><div class="ct">policy mandate</div><div class="cd">budget, caps and rules the agent obeys</div></div>
+        <div class="cbox"><span class="ci">◆</span><div class="ct">on-chain settlement</div><div class="cd">real aUSDx and aUSDC, live on Monad</div></div>
+        <div class="cbox"><span class="ci">◆</span><div class="ct">verified receipt</div><div class="cd">signed, auditable, no personal data</div></div>
+      </div>
+    </div>
+    <div class="proof">
+      <div><div class="n">5</div><div class="l">packages</div></div>
+      <div><div class="n g">26</div><div class="l">tests passing</div></div>
+      <div><div class="n">2</div><div class="l">guardrails · identity + policy</div></div>
+      <div><div class="n g">live</div><div class="l">on monad testnet</div></div>
+    </div>
+    <a class="ausdcproof" id="proofbadge" target="_blank"><span class="c">✓</span> proven on the real aUSDC A-Token, <b>0xf879…fecbcd</b> ↗</a>
+  </div>
+
+  <!-- LIVE -->
+  <section id="live">
+    <div class="eyebrow reveal">try it · live on monad</div>
+    <h2 class="h2 reveal">Set a mandate. Run the agent. Watch it get governed.</h2>
+    <p class="body reveal">The real facilitator. Set the agent's budget and per-payment cap, then run a procurement session. Verified, in-policy payments settle on-chain; everything else is refused, by identity or by policy. <span style="color:var(--mut)">The interactive run settles a stand-in A-Token so you can run it freely; the identical flow is proven on real aUSDC above.</span></p>
+    <div class="live">
+      <div class="panel reveal">
+        <h3>agent mandate</h3>
+        <div class="fld"><label>weekly budget</label><div class="pre"><input id="budget" value="50"></div></div>
+        <div class="fld"><label>max per payment</label><div class="pre"><input id="maxtx" value="20"></div></div>
+        <div class="fld plain"><label>min counterparty tier</label><input id="mintier" value="1"></div>
+        <div class="note"><span class="ok">●</span> counterparties: verified A-Pass, or an allow-list</div>
+        <button class="runbtn" id="run">▶ run procurement agent</button>
+        <div class="meter"><div class="top"><span>budget</span><span id="bleft">$50.00 left</span></div><div class="bar"><i id="bbar"></i></div></div>
+      </div>
+      <div class="ledger" id="ledger"></div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="how">
+    <div class="eyebrow reveal">how it works</div>
+    <h2 class="h2 reveal">Three things have to be true, or it doesn't move.</h2>
+    <div class="grid3">
+      <div class="card reveal"><div class="cl">identity · off-chain</div><h4>Both parties verified</h4><p>Every payment is checked against the live Cleanverse A-Pass registry. No valid A-Pass on either side, no settlement.</p></div>
+      <div class="card reveal"><div class="cl">identity · on-chain</div><h4>Clean funds by construction</h4><p>The A-Token enforces it itself. A transfer to a non-A-Pass wallet reverts on-chain, even outside our facilitator.</p></div>
+      <div class="card reveal"><div class="cl">policy · the mandate</div><h4>Within budget and rules</h4><p>Budget, per-tx cap, min-tier, allowed counterparties, set by the operator and enforced across payments. The budget depletes.</p></div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section>
+    <div class="eyebrow reveal">the flow</div>
+    <h2 class="h2 reveal">From agent call to verified payment.</h2>
+    <div class="rail reveal">
+      <div class="node"><span class="nt">AI AGENT</span>pays per call</div>
+      <div class="seg"><span class="spark"></span></div>
+      <div class="node"><span class="nt">402 SERVER</span>+ middleware</div>
+      <div class="seg"><span class="spark"></span></div>
+      <div class="node on"><span class="nt">cx402</span>verify · policy · settle</div>
+      <div class="seg"><span class="spark"></span></div>
+      <div class="node"><span class="nt">MONAD</span>aUSDx / aUSDC</div>
+    </div>
+  </section>
+
+  <!-- RECEIPT -->
+  <section id="receipt">
+    <div class="eyebrow reveal">the receipt</div>
+    <h2 class="h2 reveal">A privacy-preserving paper trail.</h2>
+    <p class="body reveal">Every settled payment emits a signed receipt: proof both parties were verified, with no personal data. Machine-readable, so another agent, your books, or an auditor can consume it.</p>
+    <div class="anat reveal">
+      <div class="rc cleared in">
+        <div class="rt"><span>cx402 · receipt</span><span>rcpt_8f2a</span></div>
+        <div class="row"><span class="k">originator</span><span><b>0x0368…d0a8</b> <span class="bl">a-pass ✓</span></span></div>
+        <div class="row"><span class="k">beneficiary</span><span><b>0xBe58…CfBB</b> <span class="bl">a-pass ✓</span></span></div>
+        <div class="row"><span class="k">cv-record</span><b>371 · tier 20</b></div>
+        <div class="row"><span class="k">kyc-hash</span><b>0x68ae…a744</b></div>
+        <div class="row"><span class="k">amount</span><b>1.00 aUSDC</b></div>
+        <div class="row"><span class="k">settled</span><a id="anatlink" target="_blank">0xf879…fecbcd ↗</a></div>
+        <div class="row"><span class="k">travel-rule</span><b>recorded</b></div>
+        <div class="rd"></div>
+        <div class="st"><span class="k">signed · ecdsa</span><span class="stamp">CLEARED</span></div>
+      </div>
+      <div class="annot">
+        <div class="a"><span class="t">proof, not PII</span><span>cvRecordId and kycHash prove KYC happened. Names and documents never leave the institution.</span></div>
+        <div class="a"><span class="t">on-chain</span><span>a real Monad txHash, clickable to the explorer.</span></div>
+        <div class="a"><span class="t">signed</span><span>ECDSA over the receipt hash, tamper-evident and independently verifiable.</span></div>
+        <div class="a"><span class="t">travel-rule</span><span>links to Cleanverse's official report for the transfer.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLKIT -->
+  <section id="build">
+    <div class="eyebrow reveal">the toolkit</div>
+    <h2 class="h2 reveal">Two sides. A couple of lines each.</h2>
+    <p class="body reveal">cx402 is something other builders drop into what they're making. There are two kinds of user, and each gets the whole compliance layer for almost no work. Everything underneath, the identity checks, the settlement, the receipts, is handled for them.</p>
+    <div class="tk">
+      <div class="tkcard reveal">
+        <div class="role">for the buyer · whoever runs the agent</div>
+        <h4>Give your AI agent a mandate</h4>
+        <p>Hand it a wallet and a mandate. The agent pays suppliers on its own, and cx402 refuses anything that breaks a rule or pays an unverified seller. The rules you can set:</p>
+        <ul class="rules">
+          <li>spending budget <span class="r">depletes as it pays</span></li>
+          <li>max per payment <span class="r">per-payment cap</span></li>
+          <li>minimum counterparty tier <span class="r">required KYC level</span></li>
+          <li>allowed counterparties <span class="r">verified, or an allow-list</span></li>
+        </ul>
+        <div class="tkcode">const agent = cx402.<span class="b">agent</span>({ wallet, policy })
+await agent.<span class="b">pay</span>({ payee, amount })</div>
+        <div class="tkcaption">all four enforced on every payment.</div>
+      </div>
+      <div class="tkcard reveal">
+        <div class="role">for the seller · whoever gets paid</div>
+        <h4>Only get paid by verified buyers</h4>
+        <p>Put one line in front of your API, your service, or your agent. From then on it only accepts payments from verified, in-policy counterparties, each one already settled on-chain and backed by a receipt. You never have to trust the buyer.</p>
+        <div class="tkcode">app.use('/api', <span class="b">cx402Paywall</span>({ price, payTo }))</div>
+        <div class="tkcaption">one line, fully protected.</div>
+      </div>
+    </div>
+    <div class="tkunder reveal">under the hood: identity · settlement · policy · receipts, built on Cleanverse and Monad</div>
+  </section>
+
+  <footer>
+    <div>cx402 · the compliant version of x402, built on Cleanverse, settled on Monad.</div>
+    <a class="btn" href="#live">▶ try it live</a>
+  </footer>
+</main>
+
+<script>
+const A='0x03681955065AF6EA51660dd63e7634fd0dE4d0a8',SUP='0xBe58C5eE13bE6a4aD8C9735c10a2967ED528CfBB',DEAD='0x000000000000000000000000000000000000dEaD';
+const EXPLORER='https://testnet.monadscan.com/tx/';
+const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
+let ASSET,NETWORK;
+const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>'$'+(Number(b)/1e6).toFixed(2),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+$('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;
+$('#h1').innerHTML='The compliant version of x402.'.split(' ').map((w,i)=>{const d=w.endsWith('.')?'<span class="d">.</span>':'';return `<span style="animation-delay:${.12+i*.1}s">${w.replace('.','')}${d}</span>`}).join(' ');
+
+// real on-chain transactions in the ticker (cleared ones link to monadscan)
+const TX=[
+  {a:'$1.00 aUSDC',to:'supplier',st:'CLEARED',c:'gd',h:'0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd'},
+  {a:'$15.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xfdec2aadb77dcc13875b95f9fca2be03b21ddd1230121a887a8d949fbdec3488'},
+  {a:'$30.00',to:'supplier',st:'BLOCKED · policy',c:'am'},
+  {a:'$10.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xa19fda4e65818f47c148502c5ed3c6633c1a14baca90ddff8ec421c7b5fd49a1'},
+  {a:'$5.00',to:'unknown seller',st:'BLOCKED · identity',c:'rd'},
+  {a:'$20.00',to:'supplier',st:'CLEARED',c:'gd',h:'0xe78cc4976c3fca482c0373043b734d514e399263eeb112a32cb4a76449932701'},
+];
+$('#ticker').innerHTML=(()=>{const s=TX.map(x=>{const inner=`● <b>${x.a}</b> <span class="d">→ ${x.to}</span> · <span class="${x.c}">${x.st}</span>${x.h?' ↗':''}`;return x.h?`<a class="it" href="${EXPLORER}${x.h}" target="_blank" style="color:inherit;text-decoration:none">${inner}</a>`:`<span class="it">${inner}</span>`}).join('');return s+s})();
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const STEPS=[
+  {payee:SUP,amount:'15',purpose:'market-data feed'},{payee:SUP,amount:'10',purpose:'inference credits'},
+  {payee:DEAD,amount:'5',purpose:'unknown seller agent'},{payee:SUP,amount:'30',purpose:'bulk data order'},
+  {payee:SUP,amount:'20',purpose:'storage'},{payee:SUP,amount:'10',purpose:'more compute'},
+];
+// seed the ledger with real prior settlements so it's never empty
+const SEED=[
+  {amount:'1',payee:SUP,status:'cleared',tx:PROOFTX,purpose:'real aUSDC'},
+  {amount:'15',payee:SUP,status:'cleared',tx:'0xfdec2aadb77dcc13875b95f9fca2be03b21ddd1230121a887a8d949fbdec3488'},
+  {amount:'10',payee:SUP,status:'cleared',tx:'0xa19fda4e65818f47c148502c5ed3c6633c1a14baca90ddff8ec421c7b5fd49a1'},
+  {amount:'5',payee:DEAD,status:'identity',reason:'payee_no_apass'},
+  {amount:'30',payee:SUP,status:'policy',reason:'over_max_per_tx'},
+  {amount:'20',payee:SUP,status:'cleared',tx:'0xe78cc4976c3fca482c0373043b734d514e399263eeb112a32cb4a76449932701'},
+];
+const short=a=>a.slice(0,6)+'…'+a.slice(-4);
+function build(d){
+  const el=document.createElement('div');el.className='rc '+(d.status||'');
+  const benef=d.status==='identity'?`<b>${short(d.payee)}</b> <span class="rd">no a-pass ✗</span>`:`<b>${short(d.payee)}</b> <span class="bl">a-pass ✓</span>`;
+  const tail=d.status==='cleared'&&d.tx?`<div class="row"><span class="k">settled</span><a href="${EXPLORER}${d.tx}" target="_blank">${d.tx.slice(0,12)}… ↗</a></div>`
+    :d.reason?`<div class="row"><span class="k">reason</span><span class="${d.status==='policy'?'am':'rd'}">${d.reason}</span></div>`:'';
+  const stamp=d.status==='cleared'?'CLEARED':'BLOCKED';
+  el.innerHTML=`<div class="rt"><span>cx402 · receipt</span><span>${d.purpose||'payment'}</span></div>
+   <div class="row"><span class="k">originator</span><span><b>${short(A)}</b> <span class="bl">a-pass ✓</span></span></div>
+   <div class="row"><span class="k">beneficiary</span><span>${benef}</span></div>
+   <div class="row"><span class="k">amount</span><b>$${d.amount} ${d.purpose==='real aUSDC'?'aUSDC':'aUSDx'}</b></div>${tail}
+   <div class="rd"></div><div class="st"><span class="k">status</span><span class="stamp">${stamp}</span></div>`;
+  return el;
+}
+function seed(){const L=$('#ledger');L.innerHTML='';SEED.forEach((d,i)=>{const el=build(d);L.appendChild(el);setTimeout(()=>el.classList.add('in'),120+i*90)})}
+seed();
+
+async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
+init();
+function setMeter(rem,bud){$('#bleft').textContent=fmt(rem)+' left';$('#bbar').style.width=Math.max(0,100*Number(rem)/Number(bud))+'%';}
+$('#bbar').style.width='100%';
+async function settle(step){const amount=toBase(step.amount);
+  const payment={scheme:'exact',network:NETWORK,payer:A,payee:step.payee,asset:ASSET,amount};
+  const requirements={scheme:'exact',network:NETWORK,asset:ASSET,payTo:step.payee,maxAmountRequired:amount,description:step.purpose};
+  const res=await fetch('/settle',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({payment,requirements})});return{status:res.status,body:await res.json()};}
+$('#run').addEventListener('click',async()=>{
+  const btn=$('#run');btn.disabled=true;btn.textContent='running…';await init();
+  $('#ledger').innerHTML='';const budgetBase=toBase($('#budget').value);setMeter(budgetBase,budgetBase);
+  await fetch('/policy',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent:A,policy:{budget:budgetBase,maxPerTx:toBase($('#maxtx').value),minTier:Number($('#mintier').value)||0}})});
+  for(const step of STEPS){
+    const pending=build({amount:step.amount,payee:step.payee,purpose:step.purpose,status:''});$('#ledger').appendChild(pending);requestAnimationFrame(()=>pending.classList.add('in'));
+    pending.querySelector('.stamp').textContent='evaluating…';await sleep(420);
+    const{status,body}=await settle(step);pending.remove();
+    const cls=status===200&&body.success?'cleared':(body.compliance?.blockedBy==='policy'?'policy':'identity');
+    const d={amount:step.amount,payee:step.payee,purpose:step.purpose,status:cls,tx:body.receipt?.payment?.txHash,reason:body.compliance?.reason};
+    const el=build(d);$('#ledger').appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));
+    const rem=body.receipt?.compliance?.checks?.policy?.remaining;if(status===200&&rem!=null)setMeter(rem,budgetBase);
+    await sleep(620);
+  }
+  btn.disabled=false;btn.textContent='▶ run again';
+});
+</script>
+</body></html>

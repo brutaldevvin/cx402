@@ -1,0 +1,22 @@
+{
+  "name": "@cx402/middleware",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "cx402 merchant middleware — one line to 402-protect a route so it only accepts verified, settled payments.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "hono": "^4.6.14",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "@cx402/facilitator": "workspace:*"
+  }
+}

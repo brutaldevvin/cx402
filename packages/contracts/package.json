@@ -1,0 +1,16 @@
+{
+  "name": "@cx402/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "aUSDx — the A-Pass-enforcing stand-in settlement token, plus compile/deploy tooling.",
+  "scripts": {
+    "compile": "node scripts/compile.mjs",
+    "deploy:token": "node scripts/deploy.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "solc": "^0.8.28",
+    "viem": "^2.52.2"
+  }
+}

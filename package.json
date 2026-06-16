@@ -1,0 +1,22 @@
+{
+  "name": "cx402",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx scripts/demo.ts",
+    "typecheck": "pnpm -r exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cx402/agent": "workspace:*",
+    "@cx402/facilitator": "workspace:*",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "viem": "^2.52.2",
+    "vitest": "^2.1.8"
+  }
+}
