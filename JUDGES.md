@@ -48,7 +48,7 @@ settlement, so they cost nothing.
   - https://testnet.monadscan.com/tx/0xa62713d4a811b1ea34e256a08829ed2c76cd519ac3abd10e6378afb8b086b2f1
 - **A real Cleanverse compliance report** for a settled tx (PDF):
   https://cx402.up.railway.app/report?tx=0xddaa7a3ac684a479f30dc8c8ea29524e1c27367f1778d8c140034a849929fc36&w=0x03681955065AF6EA51660dd63e7634fd0dE4d0a8
-- **40 tests pass live on Monad** (`pnpm test`), including the EIP-191 signed
+- **48 tests pass live on Monad** (`pnpm test`), including the EIP-191 signed
   mandate (valid, invalid, expired, replayed) and a receipt-has-no-PII check.
 
 ## Probe the API directly (for the API-minded judge)
@@ -65,6 +65,11 @@ settlement, so they cost nothing.
   accepts a valid EIP-191 mandate and rejects wrong-signer, expired, tampered,
   and replayed. The browser demo uses unsigned policy for convenience; this is
   the production path.
+- **Signed payment intent, verified live:** https://cx402.up.railway.app/proof/payment-intent
+  accepts a valid per-payment intent and rejects a tampered payee, amount, or
+  resource (the signature is bound to all of them), plus expired and replayed.
+  The demo settles via a pre-approved testnet allowance for reliability; this is
+  x402's per-payment authorization layer, implemented and provable today.
 - **Robust errors:** malformed bodies return structured JSON, never a 500. Try
   `curl -i -X POST https://cx402.up.railway.app/verify -d '{}' -H 'content-type: application/json'`
   (returns `400 invalid_intent`).
@@ -95,3 +100,9 @@ and aUSDC can route agent payments through cx402 to get: identity on both sides,
 policy enforcement, clean settlement, and a signed, auditable, PII-free receipt
 with an official Travel-Rule report attached. Everything a compliance team needs
 to sign off on autonomous stablecoin payments, and nothing it cannot.
+
+**Who would pilot it:**
+- **MCP and API providers** that want paid agent access, with proof the payer is verified and the payment authorized.
+- **PSPs and payment facilitators** offering compliant agent payments as a product.
+- **Data providers** charging agents per call, who need clean, auditable settlement.
+- **Cleanverse member institutions** piloting agent commerce on rails they already issue (A-Pass, aUSDC).

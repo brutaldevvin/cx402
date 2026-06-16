@@ -46,6 +46,7 @@
   .prow .pk{color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
   .prow .pv{color:var(--ink);text-align:right}.prow .pv a{color:inherit;text-decoration:none}.prow .pv a:hover{text-decoration:underline}
   .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
+  .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:14px;line-height:2}.endpoints a{color:var(--ink2);text-decoration:none}.endpoints a:hover{color:var(--green)}
 
   section{padding:46px 0;border-top:1px dashed var(--line)}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
@@ -120,7 +121,7 @@
 </style></head>
 <body>
 <div class="bg"></div>
-<nav><div class="wm">cx402<span class="d">.</span></div><div><a href="#live">try it</a><a href="#how">how</a><a href="#receipt">receipt</a><a href="#build">build</a><a href="https://github.com/brutaldevvin/cx402" target="_blank">github ↗</a></div></nav>
+<nav><div class="wm">cx402<span class="d">.</span></div><div><a href="#proof">judges</a><a href="#live">try it</a><a href="#how">how</a><a href="#receipt">receipt</a><a href="#build">build</a><a href="https://github.com/brutaldevvin/cx402" target="_blank">github ↗</a></div></nav>
 <div class="ticker"><div class="run" id="ticker"></div></div>
 
 <main>
@@ -155,7 +156,10 @@
       <div class="prow"><span class="pk">latest settlement</span><span class="pv" id="p-tx">-</span></div>
       <div class="prow"><span class="pk">travel rule</span><span class="pv" id="p-report">-</span></div>
       <div class="prow"><span class="pk">signed mandate</span><span class="pv" id="p-mandate">-</span></div>
+      <div class="prow"><span class="pk">payment intent</span><span class="pv" id="p-intent">-</span></div>
     </div>
+    <div class="endpoints reveal">verify it yourself: <a href="/health" target="_blank">/health</a> · <a href="/supported" target="_blank">/supported</a> · <a href="/premium" target="_blank">/premium</a> · <a href="/proof/mandate" target="_blank">/proof/mandate</a> · <a href="/proof/payment-intent" target="_blank">/proof/payment-intent</a></div>
+    <p class="body reveal" style="font-size:13px;color:var(--mut);margin-top:16px">For demo reliability the interactive run settles via a pre-approved testnet allowance, after enforcing Cleanverse identity and the signed mandate before any funds move. The signed payment intent above is x402's production per-payment authorization, real and provable, not hidden.</p>
   </section>
 
   <!-- LIVE -->
@@ -339,6 +343,7 @@ fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status=
   const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
   if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');}
   try{const m=await fetch('/proof/mandate').then(r=>r.json());set('p-mandate',m.acceptsValidSignedMandate?'<a href="/proof/mandate" target="_blank">accepts valid · rejects forged/expired/replayed ↗</a>':'failed',m.acceptsValidSignedMandate?'gd':'rd');}catch(e){}
+  try{const pi=await fetch('/proof/payment-intent').then(r=>r.json());set('p-intent',pi.acceptsValidIntent?'<a href="/proof/payment-intent" target="_blank">binds payee/amount/resource · rejects every tamper ↗</a>':'failed',pi.acceptsValidIntent?'gd':'rd');}catch(e){}
 })();
 
 async function init(){if(ASSET)return;const r=await fetch('/supported').then(r=>r.json());ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}

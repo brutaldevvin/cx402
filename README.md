@@ -1,6 +1,6 @@
 # cx402
 
-**The compliant version of x402.** A composable compliance toolkit for agent payments, built on Cleanverse and settled on Monad.
+**The compliant version of x402.** Compliance-gated, audit-ready agent payments using Cleanverse primitives, settled on Monad.
 
 **Live demo:** https://cx402.up.railway.app
 
@@ -19,7 +19,7 @@ It is not a wallet, a checkout clone, or a chatbot. It is compliance middleware 
 1. **Identity.** Both parties must hold a valid Cleanverse A-Pass. The check runs against the live registry, and the settlement asset enforces it on-chain as well, so a transfer to a non-verified wallet reverts by construction.
 2. **Policy.** The operator sets a mandate the agent cannot exceed: a spending budget that depletes across payments, a per-payment cap, a minimum counterparty tier, and an optional allow-list. Identity is checked first, then policy.
 
-Anything that fails either guardrail is refused cleanly, with the reason, and never settles.
+Anything that fails either guardrail is refused cleanly, with the reason, and never settles. And every attempt, cleared or blocked, emits a signed receipt. A blocked attempt is an auditable record in its own right (who, why, no funds moved), so the refusals prove governance, not just settlement.
 
 ## How it works
 
@@ -75,6 +75,8 @@ In production, each payment carries a signed intent:
 ```
 
 signed per payment by the payer, or scoped by a session key or a bounded allowance. The facilitator verifies the intent signature alongside the identity and policy checks before settling, so no payment moves without explicit, replay-proof authorization from the payer.
+
+This is not just a plan. The `PaymentIntentVerifier` is implemented and proven live at [`/proof/payment-intent`](https://cx402.up.railway.app/proof/payment-intent): it accepts a valid signed intent and rejects a tampered payee, amount, or resource (the signature is bound to all of them), plus expired and replayed intents. So the per-payment authorization layer is real and demonstrable today. To be plain about the demo: for reliability it settles via the pre-approved testnet allowance, enforcing Cleanverse identity and the signed mandate before moving funds, while the signed payment intent is the production path that binds each payment.
 
 ## Quick start
 

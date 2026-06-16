@@ -15,6 +15,8 @@ import { PolicyEngine } from './policy'
 import type { Policy } from './policy'
 import { MandateVerifier, canonicalMandate } from './mandate'
 import type { SignedMandate, Mandate } from './mandate'
+import { PaymentIntentVerifier, canonicalIntent } from './intent'
+import type { PaymentIntent, SignedPaymentIntent } from './intent'
 import type { PaymentPayload, PaymentRequirements, Settler, SettlementResult, ComplianceResult, Address } from './types'
 
 interface Deps {
@@ -193,6 +195,48 @@ export function createApp(d: Deps): Hono {
         wrongSigner: why(wrongSigner),
         expiredMandate: why(expired),
         tamperedMandate: why(tampered),
+        replayedNonce: why(replayed),
+      },
+    })
+  })
+
+  // live proof of x402's per-payment authorization: the payer signs an intent
+  // bound to payee/amount/asset/network/resource; the verifier rejects every tamper.
+  app.get('/proof/payment-intent', async (c) => {
+    const payer = privateKeyToAccount(generatePrivateKey())
+    const now = Math.floor(Date.now() / 1000)
+    let n = 0
+    const mk = (over: Partial<PaymentIntent> = {}): PaymentIntent => ({
+      payer: payer.address, payee: d.cfg.demoPayee, asset: d.cfg.settlementAsset, amount: '1000',
+      network: d.cfg.network, resource: '/premium', nonce: `pi-${now}-${n++}`, expiresAt: now + 600, ...over,
+    })
+    const sign = async (i: PaymentIntent): Promise<SignedPaymentIntent> => ({ intent: i, signature: await payer.signMessage({ message: canonicalIntent(i) }) })
+    const tamper = async (field: keyof PaymentIntent, value: string) => {
+      const s = await sign(mk())
+      ;(s.intent as unknown as Record<string, unknown>)[field] = value
+      return new PaymentIntentVerifier().verify(s)
+    }
+
+    const accepted = await new PaymentIntentVerifier().verify(await sign(mk()))
+    const wrongResource = await tamper('resource', '/free')
+    const wrongPayee = await tamper('payee', '0x000000000000000000000000000000000000dEaD')
+    const wrongAmount = await tamper('amount', '999999999')
+    const expired = await new PaymentIntentVerifier().verify(await sign(mk({ expiresAt: now - 60 })))
+    const rv = new PaymentIntentVerifier()
+    const sp = await sign(mk())
+    await rv.verify(sp)
+    const replayed = await rv.verify(sp)
+
+    const why = (x: Awaited<ReturnType<PaymentIntentVerifier['verify']>>) => (x.ok ? 'accepted' : x.reason)
+    return c.json({
+      scheme: 'EIP-191 personal_sign binding the payer to {payee, asset, amount, network, resource, nonce, expiresAt}',
+      note: 'the live demo settles via a pre-approved testnet allowance for reliability; this is the production per-payment authorization layer that binds each payment',
+      acceptsValidIntent: accepted.ok,
+      rejects: {
+        wrongResource: why(wrongResource),
+        wrongPayee: why(wrongPayee),
+        wrongAmount: why(wrongAmount),
+        expiredIntent: why(expired),
         replayedNonce: why(replayed),
       },
     })
