@@ -5,6 +5,7 @@ import { createPublicClient, http, parseUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { loadFacilitatorConfig } from '../src/config'
 import { createFacilitator } from '../src/app'
+import { canonicalMandate } from '../src/mandate'
 import type { EmittedEvent } from '../src/events'
 import type { PaymentPayload, PaymentRequirements, Receipt } from '../src/types'
 
@@ -84,6 +85,13 @@ live('cx402 facilitator (live Monad)', () => {
     expect(events.some((e) => e.type === 'settle')).toBe(true)
     expect((await balOf(B)) - before).toBe(parseUnits('0.001', 6))
 
+    // the receipt is a clean machine-readable artifact: no PII, carries tx + report
+    const raw = JSON.stringify(body.receipt)
+    expect(raw).not.toMatch(/fullName|idNumber|passport|"name"/i)
+    const tr = body.receipt.compliance.travelRule as { available: boolean; report?: string }
+    expect(tr.available).toBe(true)
+    expect(tr.report).toContain('/report?tx=')
+
     const got = (await (await app.request(`/receipts/${body.receipt.id}`)).json()) as { id: string }
     expect(got.id).toBe(body.receipt.id)
   })
@@ -156,8 +164,12 @@ live('cx402 policy layer - beyond an identity check (Monad)', () => {
     expect(r.compliance.blockedBy).toBe('identity')
   })
 
-  it('POST /policy registers a mandate over HTTP', async () => {
-    const body = (await (await post('/policy', { agent: A, policy: { budget: u('50') } })).json()) as { ok: boolean }
+  it('POST /policy accepts a signed mandate over HTTP', async () => {
+    const signer = privateKeyToAccount(readPk('W_PKEY'))
+    const mandate = { agent: A, budget: u('0.05'), nonce: 'http-' + Date.now(), expiresAt: Math.floor(Date.now() / 1000) + 3600 }
+    const signature = await signer.signMessage({ message: canonicalMandate(mandate) })
+    const body = (await (await post('/policy', { mandate, signature })).json()) as { ok: boolean; signed: boolean }
     expect(body.ok).toBe(true)
+    expect(body.signed).toBe(true)
   })
 })

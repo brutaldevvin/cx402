@@ -9,6 +9,8 @@ export { createFacilitator, createApp } from './app'
 export { loadFacilitatorConfig } from './config'
 export { PolicyEngine } from './policy'
 export type { Policy, PolicyReason, PolicyResult } from './policy'
+export { MandateVerifier, canonicalMandate } from './mandate'
+export type { Mandate, SignedMandate, MandateError } from './mandate'
 export * from './types'
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href

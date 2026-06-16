@@ -13,6 +13,8 @@ import { EventBus } from './events'
 import { ReceiptStore } from './store'
 import { PolicyEngine } from './policy'
 import type { Policy } from './policy'
+import { MandateVerifier } from './mandate'
+import type { SignedMandate } from './mandate'
 import type { PaymentPayload, PaymentRequirements, Settler, SettlementResult, ComplianceResult, Address } from './types'
 
 interface Deps {
@@ -22,6 +24,7 @@ interface Deps {
   store: ReceiptStore
   bus: EventBus
   policyEngine: PolicyEngine
+  mandateVerifier: MandateVerifier
   cfg: FacilitatorConfig
   signer?: PrivateKeyAccount
   facilitatorLabel: string
@@ -138,11 +141,27 @@ export function createApp(d: Deps): Hono {
     }),
   )
 
-  // set an agent's policy mandate (operator configures once)
+  // set an agent's policy mandate. production path: a signed mandate, verified
+  // before we trust it. demo path: unsigned, only when explicitly allowed.
   app.post('/policy', async (c) => {
-    const { agent, policy } = (await c.req.json()) as { agent: Address; policy: Policy }
+    const body = (await c.req.json()) as Record<string, unknown>
+
+    if (body.mandate && body.signature) {
+      const res = await d.mandateVerifier.verify(body as unknown as SignedMandate)
+      if (!res.ok) return c.json({ ok: false, error: res.reason }, 401)
+      const m = res.mandate
+      const policy: Policy = { budget: m.budget, maxPerTx: m.maxPerTx, minTier: m.minTier, allowedCounterparties: m.allowedCounterparties }
+      d.policyEngine.register(m.agent, policy)
+      return c.json({ ok: true, agent: m.agent, policy, signed: true, expiresAt: m.expiresAt, spent: '0' })
+    }
+
+    // unsigned: DEMO ONLY, gated behind an explicit flag (the page can't hold a key)
+    if (!d.cfg.demoAllowUnsignedPolicy) {
+      return c.json({ ok: false, error: 'unsigned_policy_disabled', hint: 'send a signed {mandate,signature}, or set DEMO_ALLOW_UNSIGNED_POLICY=true' }, 401)
+    }
+    const { agent, policy } = body as unknown as { agent: Address; policy: Policy }
     d.policyEngine.register(agent, policy)
-    return c.json({ ok: true, agent, policy, spent: d.policyEngine.spentBy(agent).toString() })
+    return c.json({ ok: true, agent, policy, signed: false, spent: d.policyEngine.spentBy(agent).toString() })
   })
 
   // the compliance gate + policy (no settlement)
@@ -260,6 +279,7 @@ export function createFacilitator(cfg: FacilitatorConfig, opts: { uiHtmlPath?: s
   const bus = new EventBus()
   const store = new ReceiptStore()
   const policyEngine = new PolicyEngine()
+  const mandateVerifier = new MandateVerifier()
 
   let settler: Settler
   let signer: PrivateKeyAccount | undefined
@@ -280,6 +300,6 @@ export function createFacilitator(cfg: FacilitatorConfig, opts: { uiHtmlPath?: s
     if (cfg.facilitatorPkey) signer = privateKeyToAccount(cfg.facilitatorPkey)
   }
 
-  const app = createApp({ cv, engine, settler, store, bus, policyEngine, cfg, signer, facilitatorLabel, uiHtmlPath: opts.uiHtmlPath })
-  return { app, bus, store, settler, cv, policyEngine, facilitatorLabel }
+  const app = createApp({ cv, engine, settler, store, bus, policyEngine, mandateVerifier, cfg, signer, facilitatorLabel, uiHtmlPath: opts.uiHtmlPath })
+  return { app, bus, store, settler, cv, policyEngine, mandateVerifier, facilitatorLabel }
 }

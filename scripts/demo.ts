@@ -22,15 +22,16 @@ const cfg = loadFacilitatorConfig()
 if (!cfg.cleanverse.apiId) throw new Error('missing Cleanverse creds in .env')
 const fac = createFacilitator(cfg)
 const transport = (path: string, init: RequestInit) => Promise.resolve(fac.app.request(path, init))
-const A = privateKeyToAccount(pk('W_PKEY')).address
+const payerAccount = privateKeyToAccount(pk('W_PKEY'))
+const A = payerAccount.address
 const supplier = privateKeyToAccount(pk('W2_PKEY')).address
 const DEAD = '0x000000000000000000000000000000000000dEaD' as const
 const usd = (base?: string) => (base ? formatUnits(BigInt(base), 6) + ' aUSDC' : '-')
 
 console.log(`\n${B}cx402 - verified payment intents${X}  ${D}· procurement agent on Monad testnet${X}`)
-console.log(`${D}mandate: budget 0.004 · max 0.002/tx aUSDC · verified counterparties only${X}\n`)
+console.log(`${D}signed mandate: budget 0.004 · max 0.002/tx aUSDC · verified counterparties only${X}\n`)
 
-const agent = cx402.agent({ address: A, policy: { budget: '0.004', maxPerTx: '0.002' }, transport })
+const agent = cx402.agent({ address: A, policy: { budget: '0.004', maxPerTx: '0.002' }, transport, signer: payerAccount })
 await agent.init()
 
 const steps = [

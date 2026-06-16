@@ -31,7 +31,7 @@ live('cx402 Agent SDK - E2E (Monad)', () => {
 
   beforeAll(async () => {
     // operator gives the agent a mandate: max 0.002 aUSDC per payment
-    agent = cx402.agent({ address: A, policy: { maxPerTx: '0.002' }, transport })
+    agent = cx402.agent({ address: A, policy: { maxPerTx: '0.002' }, transport, signer: privateKeyToAccount(readPk('W_PKEY')) })
     await agent.init()
   })
 

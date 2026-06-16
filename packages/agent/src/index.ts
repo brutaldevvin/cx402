@@ -10,6 +10,30 @@ export interface AgentPolicy {
   allowedCounterparties?: string[]
 }
 
+/** A mandate (base-unit amounts) the operator signs. */
+interface Mandate {
+  agent: Address
+  budget?: string
+  maxPerTx?: string
+  minTier?: number
+  allowedCounterparties?: string[]
+  nonce: string
+  expiresAt: number
+}
+
+/** Canonical JSON. MUST match the facilitator's canonicalMandate exactly. */
+function canonicalMandate(m: Mandate): string {
+  return JSON.stringify({
+    agent: m.agent,
+    budget: m.budget ?? null,
+    maxPerTx: m.maxPerTx ?? null,
+    minTier: m.minTier ?? null,
+    allowedCounterparties: m.allowedCounterparties ?? null,
+    nonce: m.nonce,
+    expiresAt: m.expiresAt,
+  })
+}
+
 export interface AgentConfig {
   /** the agent's A-Pass'd wallet address (payer) */
   address: Address
@@ -18,6 +42,9 @@ export interface AgentConfig {
   facilitatorUrl?: string
   /** in-process / custom transport (path, init) => Response - used for tests */
   transport?: (path: string, init: RequestInit) => Promise<Response>
+  /** operator key that signs the mandate (production). without it the mandate
+   *  is sent unsigned, which the facilitator only accepts in explicit demo mode. */
+  signer?: { address: string; signMessage: (a: { message: string }) => Promise<`0x${string}`> }
   /** settlement-asset decimals (default 6) */
   decimals?: number
 }
@@ -70,15 +97,24 @@ export class Cx402Agent {
     this.network = sup.kinds[0]!.network
     if (this.cfg.policy) {
       const p = this.cfg.policy
-      await this.post('/policy', {
-        agent: this.cfg.address,
-        policy: {
-          budget: p.budget != null ? this.amt(p.budget) : undefined,
-          maxPerTx: p.maxPerTx != null ? this.amt(p.maxPerTx) : undefined,
-          minTier: p.minTier,
-          allowedCounterparties: p.allowedCounterparties,
-        },
-      })
+      const policy = {
+        budget: p.budget != null ? this.amt(p.budget) : undefined,
+        maxPerTx: p.maxPerTx != null ? this.amt(p.maxPerTx) : undefined,
+        minTier: p.minTier,
+        allowedCounterparties: p.allowedCounterparties,
+      }
+      if (this.cfg.signer) {
+        const mandate: Mandate = {
+          agent: this.cfg.address,
+          ...policy,
+          nonce: `${this.cfg.address.toLowerCase()}-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+          expiresAt: Math.floor(Date.now() / 1000) + 3600,
+        }
+        const signature = await this.cfg.signer.signMessage({ message: canonicalMandate(mandate) })
+        await this.post('/policy', { mandate, signature })
+      } else {
+        await this.post('/policy', { agent: this.cfg.address, policy })
+      }
     }
     this.ready = true
     return this

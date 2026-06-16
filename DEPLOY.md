@@ -38,6 +38,7 @@ Public on-chain values (safe to paste as-is):
 | `AUSDC_ADDRESS` | `0xaC0893567D43C3E7e6e35a72803df05416C1f20D` |
 | `APASS_ADDRESS` | `0xbA82D189540CaC9DC6FF46B6837CaC1BFdEC58B9` |
 | `EXPLORER_BASE` | `https://testnet.monadscan.com/tx/` |
+| `DEMO_ALLOW_UNSIGNED_POLICY` | `true` |
 
 Secrets (copy the values from your local `.env`, never commit them):
 
@@ -59,3 +60,7 @@ Notes:
 - The live demo settles real aUSDC at 0.001 per cleared payment. The facilitator
   wallet only holds testnet gas and can move the buyer's pre-approved testnet
   aUSDC. Defund or rotate it after judging.
+- `DEMO_ALLOW_UNSIGNED_POLICY=true` lets the page register a policy mandate
+  without a signed payload, because the browser holds no key. It is demo-only.
+  The production path is a signed EIP-191 mandate (see the README "Signed
+  Mandate" section); without this flag the facilitator rejects unsigned policy.
