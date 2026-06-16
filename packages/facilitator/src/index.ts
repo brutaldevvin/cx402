@@ -19,9 +19,12 @@ if (isMain) {
   const hasUi = existsSync(uiPath)
   const { app, facilitatorLabel } = createFacilitator(cfg, { uiHtmlPath: hasUi ? uiPath : undefined })
   const port = Number(process.env.PORT ?? 8402)
-  serve({ fetch: app.fetch, port }, (info) => {
+  // bind all interfaces so container hosts (Railway/Render) can route to it;
+  // @hono/node-server otherwise defaults to localhost, unreachable from outside
+  const hostname = process.env.HOST ?? '0.0.0.0'
+  serve({ fetch: app.fetch, port, hostname }, (info) => {
     console.log(
-      `cx402 facilitator listening on :${info.port}\n` +
+      `cx402 facilitator listening on ${hostname}:${info.port}\n` +
         `  ui=${hasUi ? uiPath : '(none)'}\n` +
         `  network=${cfg.network} asset=${cfg.settlementAsset}\n` +
         `  mode=${cfg.settlementMode} facilitator=${facilitatorLabel}`,
