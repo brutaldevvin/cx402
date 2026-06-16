@@ -69,6 +69,7 @@ export function createApp(d: Deps): Hono {
     asset: d.cfg.settlementAsset,
     settlementMode: d.cfg.settlementMode,
     facilitator: d.facilitatorLabel,
+    demoUnsignedPolicy: d.cfg.demoAllowUnsignedPolicy,
   })
   app.get('/', (c) => {
     if (d.uiHtmlPath && existsSync(d.uiHtmlPath)) return c.html(readFileSync(d.uiHtmlPath, 'utf8'))
