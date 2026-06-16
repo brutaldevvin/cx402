@@ -67,7 +67,16 @@ export async function buildReceipt(args: {
       status: args.compliance.decision,
       checks: args.compliance.checks,
       reason: args.compliance.reason,
-      travelRule: 'ready',
+      // a cleared settlement gets an official Cleanverse report, regenerated
+      // fresh on demand via /report (the download token is time-limited)
+      travelRule: settlement.txHash
+        ? {
+            available: true,
+            type: 'cleanverse_transaction_report',
+            format: 'pdf',
+            report: `/report?tx=${settlement.txHash}&w=${payment.payer}`,
+          }
+        : { available: false },
     },
     settlement: { rung: settlement.rung, simulated: settlement.simulated },
   }

@@ -193,7 +193,7 @@
         <div class="row"><span class="k">kyc-hash</span><b>0x68ae…a744</b></div>
         <div class="row"><span class="k">amount</span><b>1.00 aUSDC</b></div>
         <div class="row"><span class="k">settled</span><a id="anatlink" target="_blank">0xf879…fecbcd ↗</a></div>
-        <div class="row"><span class="k">travel-rule</span><b>recorded</b></div>
+        <div class="row"><span class="k">travel-rule</span><a id="anattravel" target="_blank">official report ↗</a></div>
         <div class="rd"></div>
         <div class="st"><span class="k">signed · ecdsa</span><span class="stamp">CLEARED</span></div>
       </div>
@@ -249,7 +249,7 @@ const EXPLORER='https://testnet.monadscan.com/tx/';
 const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
 let ASSET,NETWORK;
 const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
-$('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;
+$('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
 $('#h1').innerHTML='The compliant version of x402.'.split(' ').map((w,i)=>{const d=w.endsWith('.')?'<span class="d">.</span>':'';return `<span style="animation-delay:${.12+i*.1}s">${w.replace('.','')}${d}</span>`}).join(' ');
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
@@ -283,7 +283,7 @@ const short=a=>a.slice(0,6)+'…'+a.slice(-4);
 function build(d){
   const el=document.createElement('div');el.className='rc '+(d.status||'');
   const benef=d.status==='identity'?`<b>${short(d.payee)}</b> <span class="rd">no a-pass ✗</span>`:`<b>${short(d.payee)}</b> <span class="bl">a-pass ✓</span>`;
-  const tail=d.status==='cleared'&&d.tx?`<div class="row"><span class="k">settled</span><a href="${EXPLORER}${d.tx}" target="_blank">${d.tx.slice(0,12)}… ↗</a></div>`
+  const tail=d.status==='cleared'&&d.tx?`<div class="row"><span class="k">settled</span><a href="${EXPLORER}${d.tx}" target="_blank">${d.tx.slice(0,12)}… ↗</a></div><div class="row"><span class="k">travel rule</span><a href="/report?tx=${d.tx}&w=${A}" target="_blank">official report ↗</a></div>`
     :d.reason?`<div class="row"><span class="k">reason</span><span class="${d.status==='policy'?'am':'rd'}">${d.reason}</span></div>`:'';
   const stamp=d.status==='cleared'?'CLEARED':'BLOCKED';
   el.innerHTML=`<div class="rt"><span>cx402 · receipt</span><span>${d.purpose||'payment'}</span></div>

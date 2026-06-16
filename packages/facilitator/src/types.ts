@@ -89,7 +89,7 @@ export interface Receipt {
     status: 'CLEARED' | 'BLOCKED'
     checks: ComplianceResult['checks']
     reason?: string
-    travelRule: 'ready'
+    travelRule: { available: false } | { available: true; type: string; format: string; report: string }
   }
   settlement: { rung: string; simulated: boolean }
   signature?: { signer: string; value: string; alg: string; over: string }

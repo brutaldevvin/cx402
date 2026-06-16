@@ -151,6 +151,27 @@ export function createApp(d: Deps): Hono {
     return receipt ? c.json(receipt) : c.json({ error: 'not_found' }, 404)
   })
 
+  // the official Cleanverse Travel-Rule / Transaction report for a settled tx.
+  // regenerated fresh per request because the download token is time-limited.
+  app.get('/report', async (c) => {
+    const tx = c.req.query('tx')
+    const w = c.req.query('w')
+    if (!tx || !w) return c.json({ error: 'tx and w (wallet) are required' }, 400)
+    const r = await d.cv.downloadTravelRule({ txHash: tx, wallet: { chain: d.cfg.chain, address: w } })
+    const data = r.data as { downloadUrl?: string } | undefined
+    if (r.code === '0000' && data?.downloadUrl) return c.redirect(data.downloadUrl, 302)
+    // a just-settled tx takes a short while for Cleanverse to index before a
+    // report can be generated; show a friendly note rather than a raw error
+    return c.html(
+      `<!doctype html><meta charset="utf8"><title>cx402 report</title>` +
+        `<body style="font-family:ui-monospace,monospace;max-width:560px;margin:80px auto;padding:0 20px;color:#2b2b2b;line-height:1.6">` +
+        `<h2>Report is being generated</h2>` +
+        `<p>Cleanverse is still indexing this settlement on-chain. The official compliance report for this transaction will be available shortly, refresh this page in a minute.</p>` +
+        `<p style="color:#999;font-size:13px">tx ${tx}</p></body>`,
+      202,
+    )
+  })
+
   // SSE stream for the wall
   app.get('/events', (c) =>
     streamSSE(c, async (stream) => {
