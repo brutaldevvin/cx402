@@ -2,6 +2,8 @@
 
 **The compliant version of x402.** A composable compliance toolkit for agent payments, built on Cleanverse and settled on Monad.
 
+**Live demo:** https://cx402.up.railway.app
+
 x402 lets an AI agent pay for a resource over HTTP. cx402 adds the part finance actually requires: every payment is checked against two guardrails before any money moves, and each cleared payment emits a signed, privacy-preserving receipt.
 
 ## Two guardrails
