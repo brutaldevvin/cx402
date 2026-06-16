@@ -13,6 +13,7 @@
   .bg{position:fixed;inset:-40px;z-index:0;pointer-events:none;opacity:.5;background-image:linear-gradient(#657b6936 1px,transparent 1px),linear-gradient(90deg,#657b6936 1px,transparent 1px);background-size:46px 46px;animation:drift 28s linear infinite}
   @keyframes drift{to{transform:translate(46px,46px)}}
   main{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 30px}
+  main,section,.hero,.herodemo,.hdleft,.hdright,.live,.ledger,.panel,.card,.anat,.codewrap,.tk,.tkcard,.ppanel,.rail,.rc,pre,.tkcode{min-width:0}
   nav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;margin:14px auto 0;max-width:1140px;padding:13px 30px;background:var(--ink);border-radius:4px;transform:skewX(-9deg)}
   nav>div{transform:skewX(9deg);display:flex;align-items:center}
   nav .wm{font-weight:800;letter-spacing:-.04em;font-size:19px;color:var(--card)}.wm .d{color:var(--green2)}
@@ -49,9 +50,6 @@
   .pv.gd{color:var(--green)}.pv.rd{color:#c0392b}.pv.am{color:#b8860b}
   .endpoints{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--mut);margin-top:14px;line-height:2}.endpoints a{color:var(--ink2);text-decoration:none}.endpoints a:hover{color:var(--green)}
   .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px}.hook .d{color:var(--green)}
-  .hstrip{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
-  .hsig{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);background:var(--card);border:1px solid var(--edge);border-radius:30px;padding:7px 14px;text-decoration:none;white-space:nowrap}
-  .hsig.ok{color:var(--green);border-color:#0a9a4540;background:#0a9a450c}
   .herodemo{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:22px;align-items:start}
   .hdleft{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:20px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4)}
   .hflds{display:flex;gap:12px;margin-bottom:14px}.hflds label{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut)}
@@ -60,8 +58,8 @@
   @media(max-width:860px){.herodemo{grid-template-columns:1fr}}
 
   section{padding:46px 0;border-top:1px dashed var(--line)}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--green)}
   .h2{font-weight:700;letter-spacing:-.02em;font-size:33px;line-height:1.1;margin-top:11px}
+  section>.h2:first-child{margin-top:0}
   .body{font-size:16px;line-height:1.6;color:var(--ink2);max-width:620px;margin-top:12px}
   .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
 
@@ -84,8 +82,8 @@
   .ledger{display:flex;flex-direction:column;gap:12px}
   .rc{background:var(--card);border:1px solid var(--edge);border-radius:4px;box-shadow:0 12px 32px -22px rgba(40,34,20,.4);padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink2);line-height:1.9;clip-path:inset(0 0 100% 0);opacity:0;transition:clip-path .5s cubic-bezier(.2,.7,.2,1),opacity .4s}
   .rc.in{clip-path:inset(0 0 0 0);opacity:1}
-  .rc .rt{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:6px}
-  .rc .row{display:flex;justify-content:space-between}.rc b{color:var(--ink);font-weight:500}.rc .k{color:var(--mut)}
+  .rc .rt{display:flex;justify-content:space-between;gap:12px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:6px}
+  .rc .row{display:flex;justify-content:space-between;gap:12px}.rc .row span:last-child,.rc .row b,.rc .row a{min-width:0;overflow-wrap:anywhere}.rc b{color:var(--ink);font-weight:500}.rc .k{color:var(--mut);flex:0 0 auto}
   .rc .rd{border-top:1px dashed var(--line);margin:7px 0 5px}
   .rc .st{display:flex;justify-content:space-between;align-items:center}.rc .stamp{font-size:15px;font-weight:700;letter-spacing:.1em}
   .rc.cleared{border-left:3px solid var(--green)}.rc.cleared .stamp{color:var(--green)}
@@ -108,7 +106,7 @@
   .pkgs{font-family:'JetBrains Mono',monospace;font-size:13px}
   .pkgs .p{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line)}.pkgs .p:last-child{border:none}
   .pkgs .nm{color:var(--ink);font-weight:500;min-width:180px}.pkgs .ds{color:var(--mut)}
-  .tk{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+  .tk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:24px}
   .tkcard{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:26px;display:flex;flex-direction:column}
   .tkcard .role{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
   .tkcard h4{font-size:20px;font-weight:600;margin-bottom:8px}
@@ -126,9 +124,54 @@
   .seg:nth-child(2) .spark{animation-delay:0s}.seg:nth-child(4) .spark{animation-delay:.6s}.seg:nth-child(6) .spark{animation-delay:1.2s}
   @keyframes srun{from{left:-4px;opacity:0}10%{opacity:1}90%{opacity:1}to{left:calc(100% - 3px);opacity:0}}
 
-  footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)}
+  footer{border-top:1px dashed var(--line);margin-top:30px;padding:40px 0 60px;display:flex;justify-content:space-between;align-items:center;gap:24px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut)}
   .btn{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--card);background:var(--ink);border-radius:30px;padding:13px 24px;text-decoration:none;transition:transform .2s}.btn:hover{transform:translateY(-2px)}
-  @media(max-width:860px){.herogrid,.live,.anat,.codewrap{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.panel{position:static}}
+  @media(max-width:860px){
+    .herogrid,.live,.anat,.codewrap,.tk{grid-template-columns:1fr}
+    .grid3{grid-template-columns:1fr}
+    .panel{position:static}
+  }
+  @media(max-width:700px){
+    main{padding:0 16px}
+    nav{width:calc(100% - 24px);margin:10px 12px 0;padding:11px 12px;display:grid;grid-template-columns:1fr;gap:9px;transform:none;border-radius:6px}
+    nav>div{transform:none;min-width:0}
+    nav>div:last-child{display:flex;flex-wrap:wrap;gap:8px 12px}
+    nav a{margin-left:0;font-size:11px}
+    .ticker{margin-top:8px}
+    .hero{padding-top:34px}
+    section{padding:36px 0}
+    .hook{font-size:34px;line-height:1.08}
+    .h2{font-size:27px;line-height:1.14}
+    .lead{font-size:16px}
+    .herodemo{gap:18px}
+    .hdleft,.panel,.card,.tkcard{padding:18px}
+    .proof div{flex-basis:50%;min-width:0}
+    .prow{flex-direction:column;align-items:flex-start;gap:6px}
+    .prow .pv{text-align:left;max-width:100%;overflow-wrap:anywhere}
+    .endpoints{overflow-wrap:anywhere}
+    .annot .a{display:block}
+    .annot .a .t{display:block;min-width:0;margin-bottom:4px}
+    pre,.tkcode{font-size:11.5px;padding:14px;line-height:1.6}
+    .tkcard p{margin-bottom:14px}
+    .rules li{align-items:flex-start;flex-direction:column;gap:3px}
+    .rail{flex-direction:column;align-items:stretch;gap:8px;padding:18px;overflow:hidden}
+    .node{min-width:0;width:100%;padding:12px}
+    .seg{flex:0 0 32px;width:2px;height:32px;margin:0 auto;background:repeating-linear-gradient(180deg,var(--line) 0 5px,transparent 5px 10px)}
+    .spark{left:50%;top:-4px;transform:translateX(-50%);animation:sdrop 1.8s linear infinite}
+    @keyframes sdrop{from{top:-4px;opacity:0}10%{opacity:1}90%{opacity:1}to{top:calc(100% - 3px);opacity:0}}
+    .rc{padding:14px}
+    .rc .rt,.rc .row,.rc .st{gap:8px}
+    footer{display:grid;grid-template-columns:1fr;gap:18px;padding-bottom:42px}
+    footer>div:last-child{flex-wrap:wrap}
+  }
+  @media(max-width:440px){
+    .hook{font-size:31px}
+    .h2{font-size:25px}
+    .hflds{flex-direction:column}
+    .proof div{flex-basis:100%;border-right:none;border-bottom:1px solid var(--edge)}
+    .proof div:last-child{border-bottom:none}
+    .tkcode{white-space:pre-wrap;overflow-wrap:anywhere}
+  }
 </style></head>
 <body>
 <div class="bg"></div>
@@ -137,15 +180,8 @@
 
 <main>
   <div class="hero" id="live">
-    <div class="eyebrow">live · real aUSDC on monad</div>
     <h1 class="hook" id="h1">AI agents can pay. cx402 decides if they're <span class="d">allowed</span> to.</h1>
     <p class="lead">An AI agent tries six payments. cx402 settles only the verified, in-policy ones. The rest are blocked before money moves. Every cleared payment is real aUSDC on Monad, checked against Cleanverse A-Pass and recorded in a Travel Rule report.</p>
-    <div class="hstrip">
-      <span class="hsig" id="h-cv">● checking Cleanverse…</span>
-      <span class="hsig" id="h-payer">payer A-Pass -</span>
-      <span class="hsig" id="h-payee">payee A-Pass -</span>
-      <a class="hsig ok" id="proofbadge" target="_blank">real aUSDC on Monad ✓</a>
-    </div>
     <div class="herodemo">
       <div class="hdleft">
         <div class="hflds">
@@ -164,9 +200,8 @@
 
   <!-- LIVE PROOF PANEL -->
   <section id="proof">
-    <div class="eyebrow reveal">live proof</div>
     <h2 class="h2 reveal">Don't take our word for it.</h2>
-    <p class="body reveal">Every value below is read straight off the running facilitator when you loaded this page, and is independently checkable.</p>
+    <p class="body reveal">Live proof, not claims. Every value below is read straight off the running facilitator when you loaded this page, and is independently checkable.</p>
     <div class="ppanel reveal">
       <div class="prow"><span class="pk">facilitator</span><span class="pv" id="p-status">checking…</span></div>
       <div class="prow"><span class="pk">Cleanverse API</span><span class="pv" id="p-cv">-</span></div>
@@ -185,8 +220,7 @@
 
   <!-- HOW -->
   <section id="how">
-    <div class="eyebrow reveal">how it works</div>
-    <h2 class="h2 reveal">Three things have to be true, or it doesn't move.</h2>
+    <h2 class="h2 reveal">How Payments Get Cleared or Blocked</h2>
     <div class="grid3">
       <div class="card reveal"><div class="cl">identity · off-chain</div><h4>Both parties verified</h4><p>Every payment is checked against the live Cleanverse A-Pass registry. No valid A-Pass on either side, no settlement.</p></div>
       <div class="card reveal"><div class="cl">identity · on-chain</div><h4>Clean funds by construction</h4><p>The A-Token enforces it itself. A transfer to a non-A-Pass wallet reverts on-chain, even outside our facilitator.</p></div>
@@ -196,8 +230,7 @@
 
   <!-- FLOW -->
   <section>
-    <div class="eyebrow reveal">the flow</div>
-    <h2 class="h2 reveal">From agent call to verified payment.</h2>
+    <h2 class="h2 reveal">From Agent Call to Verified Settlement</h2>
     <div class="rail reveal">
       <div class="node"><span class="nt">AI AGENT</span>pays per call</div>
       <div class="seg"><span class="spark"></span></div>
@@ -211,8 +244,7 @@
 
   <!-- RECEIPT -->
   <section id="receipt">
-    <div class="eyebrow reveal">the receipt</div>
-    <h2 class="h2 reveal">A privacy-preserving paper trail.</h2>
+    <h2 class="h2 reveal">Receipts Without Personal Data</h2>
     <p class="body reveal">Every settled payment emits a signed receipt: proof both parties were verified, with no personal data. Machine-readable, so another agent, your books, or an auditor can consume it.</p>
     <div class="anat reveal">
       <div class="rc cleared in">
@@ -238,8 +270,7 @@
 
   <!-- TOOLKIT -->
   <section id="build">
-    <div class="eyebrow reveal">the toolkit</div>
-    <h2 class="h2 reveal">Two sides. A couple of lines each.</h2>
+    <h2 class="h2 reveal">Two Integrations: Buyer and Seller</h2>
     <p class="body reveal">cx402 is something other builders drop into what they're making. There are two kinds of user, and each gets the whole compliance layer for almost no work. Everything underneath, the identity checks, the settlement, the receipts, is handled for them.</p>
     <div class="tk">
       <div class="tkcard reveal">
@@ -279,7 +310,7 @@ const EXPLORER='https://testnet.monadscan.com/tx/';
 const PROOFTX='0xf87975cbfed87267ef4ea616033cb1eb322757d2f4d17044abe7eccdb1fecbcd';
 let ASSET,NETWORK;
 const $=s=>document.querySelector(s),toBase=v=>String(Math.round(parseFloat(v)*1e6)),fmt=b=>(Number(b)/1e6).toFixed(3)+' aUSDC',sleep=ms=>new Promise(r=>setTimeout(r,ms));
-$('#proofbadge').href=EXPLORER+PROOFTX;$('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
+$('#anatlink').href=EXPLORER+PROOFTX;$('#anattravel').href='/report?tx='+PROOFTX+'&w='+A;
 
 // real on-chain transactions in the ticker (cleared ones link to monadscan)
 const TX=[
@@ -338,10 +369,6 @@ fetch('/health').then(r=>r.json()).then(h=>{$('#livestatus').innerHTML=h.status=
     set('p-payee',ck.payeeApass?'code '+ck.payeeApass.code+(ck.payeeApass.verified?' · verified':''):'-',ck.payeeApass&&ck.payeeApass.verified?'gd':'rd');
     set('p-asset','<a href="'+ADDR+h.settlementAsset+'" target="_blank">'+h.settlementAsset.slice(0,10)+'…'+h.settlementAsset.slice(-4)+' ↗</a>','');
     set('p-mode',h.settlementMode,'');
-    const sig=(id,html,ok)=>{const e=$('#'+id);if(!e)return;e.innerHTML=html;e.className='hsig'+(ok?' ok':'');};
-    sig('h-cv',ck.cleanverseReachable?'● Cleanverse reachable':'● Cleanverse unreachable',ck.cleanverseReachable);
-    sig('h-payer','payer A-Pass '+(ck.payerApass?'code '+ck.payerApass.code:'-'),ck.payerApass&&ck.payerApass.verified);
-    sig('h-payee','payee A-Pass '+(ck.payeeApass?'code '+ck.payeeApass.code:'-'),ck.payeeApass&&ck.payeeApass.verified);
   }catch(e){set('p-status','unreachable','rd');}
   const tx=(SEED.find(function(s){return s.tx;})||{}).tx;
   if(tx){set('p-tx','<a href="'+EXPLORER+tx+'" target="_blank">'+tx.slice(0,16)+'… ↗</a>','');set('p-report','<a href="/report?tx='+tx+'&w='+A+'" target="_blank">official PDF ↗</a>','');const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href='/report?tx='+tx+'&w='+A;}}
