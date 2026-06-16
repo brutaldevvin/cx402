@@ -15,3 +15,12 @@ out/
 .DS_Store
 *.log
 .gstack/
+
+# design exploration + deck artifacts (kept local, not in the repo)
+cx402-BUILD.md
+cx402-brand-*.png
+cx402-calm-*.png
+cx402-wild-*.png
+cx402-deck.pdf
+cx402-deck.png
+cx402-deck-preview.png
