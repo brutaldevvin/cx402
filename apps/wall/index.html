@@ -16,7 +16,7 @@
   main,section,.hero,.herodemo,.hdleft,.hdright,.live,.ledger,.panel,.card,.anat,.codewrap,.tk,.tkcard,.ppanel,.rail,.rc,pre,.tkcode{min-width:0}
   nav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;margin:14px auto 0;max-width:1140px;padding:13px 30px;background:var(--ink);border-radius:4px;transform:skewX(-9deg)}
   nav>div{transform:skewX(9deg);display:flex;align-items:center}
-  nav .wm{font-weight:800;letter-spacing:-.04em;font-size:19px;color:var(--card)}.wm .d{color:var(--green2)}
+  nav .wm{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:-.04em;font-size:19px;color:var(--card);text-decoration:none;margin-left:0}.wm .d{color:var(--green2)}
   nav a{font-family:'JetBrains Mono',monospace;font-size:12px;color:#c9c2b0;text-decoration:none;margin-left:20px}nav a:hover{color:var(--card)}
   .ticker{overflow:hidden;border-bottom:1px dashed var(--line);margin-top:12px;white-space:nowrap}
   .ticker .run{display:inline-block;padding:8px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);animation:tick 40s linear infinite}
@@ -61,10 +61,12 @@
   .protostatus.gd{color:var(--green)}.protostatus.rd{color:#c0392b}.protostatus.am{color:#b8860b}
   .protocard p{font-size:13.5px;color:var(--ink2);line-height:1.45;margin-top:8px;flex:1}
   .protoactions,.agentlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
-  .protoactions a,.protoactions button,.agentlinks a,.agentlinks button{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:8px 10px;text-decoration:none;cursor:pointer}
-  .protoactions a:hover,.protoactions button:hover,.agentlinks a:hover,.agentlinks button:hover{border-color:var(--green)}
+  .protoactions a,.protoactions button,.agentlinks a,.agentlinks button{font-family:'JetBrains Mono',monospace;font-size:11.5px;border:1px solid;border-radius:6px;padding:8px 10px;text-decoration:none;cursor:pointer}
+  .protoactions a,.protoactions button{background:#26231c;color:#ece7da;border-color:#3a3327}
+  .protoactions a:hover,.protoactions button:hover{border-color:#0a9a45;color:#fffdf8}
+  .agentlinks a,.agentlinks button{color:var(--ink);background:var(--paper);border-color:var(--edge)}
+  .agentlinks a:hover,.agentlinks button:hover{border-color:var(--green)}
   .agentready{background:#1c1a14;border:1px solid #3a3327;border-radius:8px;padding:14px;margin-top:12px;color:#ece7da;box-shadow:0 16px 36px -28px rgba(20,16,8,.8)}
-  .agenttop{display:flex;justify-content:space-between;gap:10px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8a8475;margin-bottom:9px}.agenttop .ok{color:#7fd99b}
   .agentready h3{font-size:15px;font-weight:700;margin-bottom:7px;color:#fffdf8}
   .agentready p{font-size:12.5px;line-height:1.45;color:#c9c2b0}.agentready .mono{color:#7fd99b}
   .agentprompt{display:flex;gap:9px;margin-top:11px;background:#11100c;border:1px solid #302a20;border-radius:6px;padding:10px 11px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.45;color:#ece7da}.agentprompt .mark{color:#7fd99b;flex:0 0 auto}.agentprompt .cmd{min-width:0;overflow-wrap:anywhere}
@@ -194,9 +196,9 @@
     .protoactions a,.protoactions button{flex:1;text-align:center}
   }
 </style></head>
-<body>
+<body id="top">
 <div class="bg"></div>
-<nav><div class="wm">cx402<span class="d">.</span></div><div><a href="#proof">judges</a><a href="#live">try it</a><a href="#how">how</a><a href="#receipt">receipt</a><a href="#build">build</a><a href="https://github.com/brutaldevvin/cx402" target="_blank">github ↗</a></div></nav>
+<nav><div><a class="wm" href="#top" aria-label="cx402 home">cx402<span class="d">.</span></a></div><div><a href="#live">try it</a><a href="#proof">proofs</a><a href="#how">how</a><a href="#receipt">receipt</a><a href="#build">build</a><a href="https://github.com/brutaldevvin/cx402" target="_blank">github ↗</a></div></nav>
 <div class="ticker"><div class="run" id="ticker"></div></div>
 
 <main>
@@ -212,7 +214,6 @@
         <input id="mintier" type="hidden" value="1">
         <button class="runbtn" id="run">▶ run procurement agent</button>
         <div class="agentready">
-          <div class="agenttop"><span>~/cx402/agent</span><span class="ok">agent-ready</span></div>
           <h3>Use cx402 with an agent</h3>
           <p>Give Codex, Claude, or another agent one instruction. The hosted skill tells it how to verify cx402, discover the payment rail, inspect the 402 challenge, run compliance preflight, and make authorized agent payments.</p>
           <div class="agentprompt"><span class="mark">$</span><span class="cmd">Read https://cx402.up.railway.app/skill.md and follow the instructions to use cx402 safely.</span></div>
@@ -358,7 +359,7 @@ await agent.<span class="b">pay</span>({ payee, amount })</div>
   </section>
 
   <footer>
-    <div>cx402 · the compliant version of x402, built on Cleanverse, settled on Monad.</div>
+    <div>cx402 · the compliant version of x402, built on Cleanverse, settled on Monad. built by <a href="https://x.com/brutaldevvin" target="_blank" rel="noreferrer">@brutaldevvin</a></div>
     <div style="display:flex;gap:16px;align-items:center"><a href="https://github.com/brutaldevvin/cx402" target="_blank">github ↗</a><a class="btn" href="#live">▶ try it live</a></div>
   </footer>
 </main>
