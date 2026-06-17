@@ -82,6 +82,50 @@ function validIntent(body: unknown): { payment: PaymentPayload; requirements: Pa
   return { payment: p as unknown as PaymentPayload, requirements: r as unknown as PaymentRequirements }
 }
 
+const MONAD_VISION_TX_URL = /https:\/\/testnet\.monadvision\.com\/tx\/(0x[0-9a-fA-F]{64})/g
+
+function exactArrayBuffer(buffer: Buffer): ArrayBuffer {
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+}
+
+function rebuildPdfXref(body: string): string {
+  const xrefIndex = body.lastIndexOf('\nxref\n')
+  if (xrefIndex < 0) return body
+  const xrefStart = xrefIndex + 1
+  const trailerIndex = body.indexOf('trailer\n', xrefStart)
+  if (trailerIndex < 0) return body
+  const startxrefIndex = body.indexOf('startxref\n', trailerIndex)
+  if (startxrefIndex < 0) return body
+  const trailer = body.slice(trailerIndex + 'trailer\n'.length, startxrefIndex)
+  const size = Number(trailer.match(/\/Size\s+(\d+)/)?.[1])
+  if (!Number.isFinite(size) || size < 1) return body
+
+  const prefix = body.slice(0, xrefStart)
+  const offsets = new Map<number, number>()
+  for (const match of prefix.matchAll(/(^|\n)(\d+) 0 obj/g)) {
+    offsets.set(Number(match[2]), match.index! + (match[1] ?? '').length)
+  }
+
+  let xref = `xref\n0 ${size}\n0000000000 65535 f \n`
+  for (let i = 1; i < size; i++) {
+    const offset = offsets.get(i)
+    xref += offset == null ? '0000000000 00000 f \n' : String(offset).padStart(10, '0') + ' 00000 n \n'
+  }
+  return prefix + xref + 'trailer\n' + trailer + 'startxref\n' + prefix.length + '\n%%EOF\n'
+}
+
+function rewritePdfExplorerLinks(pdf: ArrayBuffer, explorerBase: string): ArrayBuffer {
+  const source = Buffer.from(pdf)
+  const body = source.toString('latin1')
+  let changed = false
+  const base = explorerBase.endsWith('/') ? explorerBase : explorerBase + '/'
+  const rewritten = body.replace(MONAD_VISION_TX_URL, (_match, tx: string) => {
+    changed = true
+    return base + tx
+  })
+  return changed ? exactArrayBuffer(Buffer.from(rebuildPdfXref(rewritten), 'latin1')) : pdf
+}
+
 export function createApp(d: Deps): Hono {
   const app = new Hono()
 
@@ -405,7 +449,7 @@ export function createApp(d: Deps): Hono {
         c.header('content-type', pdf.headers.get('content-type') ?? 'application/pdf')
         c.header('content-disposition', `inline; filename="${filename}"`)
         c.header('cache-control', 'no-store')
-        return c.body(await pdf.arrayBuffer())
+        return c.body(rewritePdfExplorerLinks(await pdf.arrayBuffer(), d.cfg.explorerBase))
       }
     }
     // a just-settled tx takes a short while for Cleanverse to index before a
