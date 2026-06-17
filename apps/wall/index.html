@@ -60,13 +60,18 @@
   .protostatus{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;line-height:1.35;color:var(--ink);margin-top:12px;text-transform:uppercase;letter-spacing:.08em}
   .protostatus.gd{color:var(--green)}.protostatus.rd{color:#c0392b}.protostatus.am{color:#b8860b}
   .protocard p{font-size:13.5px;color:var(--ink2);line-height:1.45;margin-top:8px;flex:1}
-  .transcript{margin-top:12px;background:#1c1a14;color:#ece7da;border-radius:7px;padding:13px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;min-height:138px}
+  .transcript{margin-top:12px;background:#1c1a14;color:#ece7da;border-radius:7px;padding:13px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+  .transcript .tl{color:#8a8475}.transcript .ok{color:#7fd99b}.transcript .warn{color:#e0b45f}
   .protoactions,.agentlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
   .protoactions a,.protoactions button,.agentlinks a,.agentlinks button{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:8px 10px;text-decoration:none;cursor:pointer}
   .protoactions a:hover,.protoactions button:hover,.agentlinks a:hover,.agentlinks button:hover{border-color:var(--green)}
-  .agentready{border:1px solid #0a9a4540;background:#0a9a450c;border-radius:8px;padding:13px;margin-top:12px}
-  .agentready h3{font-size:14px;font-weight:700;margin-bottom:5px}
-  .agentready p{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+  .agentready{background:#1c1a14;border:1px solid #3a3327;border-radius:8px;padding:14px;margin-top:12px;color:#ece7da;box-shadow:0 16px 36px -28px rgba(20,16,8,.8)}
+  .agenttop{display:flex;justify-content:space-between;gap:10px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8a8475;margin-bottom:9px}.agenttop .ok{color:#7fd99b}
+  .agentready h3{font-size:15px;font-weight:700;margin-bottom:7px;color:#fffdf8}
+  .agentready p{font-size:12.5px;line-height:1.45;color:#c9c2b0}.agentready .mono{color:#7fd99b}
+  .agentprompt{display:flex;gap:9px;margin-top:11px;background:#11100c;border:1px solid #302a20;border-radius:6px;padding:10px 11px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.45;color:#ece7da}.agentprompt .mark{color:#7fd99b;flex:0 0 auto}.agentprompt .cmd{min-width:0;overflow-wrap:anywhere}
+  .agentready .agentlinks a,.agentready .agentlinks button{background:#26231c;color:#ece7da;border-color:#3a3327}.agentready .agentlinks a:hover,.agentready .agentlinks button:hover{border-color:#0a9a45;color:#fffdf8}
+  .agentcompat{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8a8475}.agentcompat b{font-weight:500;color:#c9c2b0;border:1px solid #3a3327;border-radius:20px;padding:4px 7px;background:#11100c}
   .hook{font-weight:800;letter-spacing:-.03em;line-height:1.07;font-size:40px;max-width:840px;margin-top:8px}.hook .d{color:var(--green)}
   .herodemo{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:22px;align-items:start}
   .hdleft{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:20px;box-shadow:0 18px 50px -30px rgba(40,34,20,.4)}
@@ -111,7 +116,6 @@
 
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:22px}
   .card{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:24px}
-  .card .cl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
   .card h4{font-size:18px;font-weight:600;margin-bottom:7px}.card p{font-size:14px;color:var(--ink2);line-height:1.55}
 
   .anat{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;margin-top:26px}
@@ -210,9 +214,12 @@
         <input id="mintier" type="hidden" value="1">
         <button class="runbtn" id="run">▶ run procurement agent</button>
         <div class="agentready">
+          <div class="agenttop"><span>~/cx402/agent</span><span class="ok">agent-ready</span></div>
           <h3>Use cx402 with an agent</h3>
-          <p>cx402 includes an agent-readable skill and live proof endpoints. Give <span class="mono">/skill.md</span> to Codex, Claude, or another agent so it can verify the facilitator, inspect the 402 challenge, and understand the compliant payment flow.</p>
+          <p>Give <span class="mono">/skill.md</span> to Codex, Claude, or another agent so it can verify cx402, discover the payment rail, inspect the 402 challenge, run compliance preflight, and use cx402 to make authorized agent payments.</p>
+          <div class="agentprompt"><span class="mark">$</span><span class="cmd">read /skill.md, verify cx402, inspect /premium, then pay only when authorized</span></div>
           <div class="agentlinks"><button type="button" data-copy-url="/skill.md">Copy SKILL.md</button><a href="/skill.md" target="_blank">Open /skill.md</a><a href="/llms.txt" target="_blank">Open /llms.txt</a><a href="/openapi.json" target="_blank">Open /openapi.json</a></div>
+          <div class="agentcompat"><span>works with</span><b>Codex</b><b>Claude</b><b>other agents</b></div>
         </div>
         <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
         <div class="hlinks"><a id="h-tx" target="_blank">latest tx -</a> · <a id="h-report" target="_blank">travel rule report -</a></div>
@@ -247,11 +254,11 @@ resource: premium market-data feed</pre>
           <div class="protoendpoint">/proof/mandate</div>
           <div class="protostatus" id="proto-mandate-status">checking mandate proof</div>
           <p>This is the operator side. The human or institution gives the agent a signed spending mandate: budget, max payment, minimum counterparty tier, and optional allow-list. cx402 rejects forged, expired, tampered, or replayed mandates.</p>
-          <pre class="transcript" id="proto-mandate-tx">valid mandate       accepted
-wrong signer        rejected
-expired mandate     rejected
-tampered budget     rejected
-replayed nonce      rejected</pre>
+          <pre class="transcript" id="proto-mandate-tx"><span class="tl">valid mandate:</span> <span class="ok">accepted</span>
+<span class="tl">wrong signer:</span> <span class="ok">rejected</span>
+<span class="tl">expired mandate:</span> <span class="ok">rejected</span>
+<span class="tl">tampered budget:</span> <span class="ok">rejected</span>
+<span class="tl">replayed nonce:</span> <span class="ok">rejected</span></pre>
           <div class="protoactions"><a href="/proof/mandate" target="_blank">Open proof</a><button type="button" data-curl="/proof/mandate">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -259,12 +266,12 @@ replayed nonce      rejected</pre>
           <div class="protoendpoint">/proof/payment-intent</div>
           <div class="protostatus" id="proto-intent-status">checking intent proof</div>
           <p>This is the per-payment authorization layer. A payment intent binds the payer to the exact payee, amount, asset, network, resource, nonce, and expiry. If any field changes, the signature breaks.</p>
-          <pre class="transcript" id="proto-intent-tx">valid intent        accepted
-wrong payee         rejected
-wrong amount        rejected
-wrong resource      rejected
-expired intent      rejected
-replayed nonce      rejected</pre>
+          <pre class="transcript" id="proto-intent-tx"><span class="tl">valid intent:</span> <span class="ok">accepted</span>
+<span class="tl">wrong payee:</span> <span class="ok">rejected</span>
+<span class="tl">wrong amount:</span> <span class="ok">rejected</span>
+<span class="tl">wrong resource:</span> <span class="ok">rejected</span>
+<span class="tl">expired intent:</span> <span class="ok">rejected</span>
+<span class="tl">replayed nonce:</span> <span class="ok">rejected</span></pre>
           <div class="protoactions"><a href="/proof/payment-intent" target="_blank">Open proof</a><button type="button" data-curl="/proof/payment-intent">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -272,12 +279,12 @@ replayed nonce      rejected</pre>
           <div class="protoendpoint">/health</div>
           <div class="protostatus" id="proto-health-status">checking infrastructure</div>
           <p>This proves the demo is live: Cleanverse is reachable, Monad is reachable, both parties have valid A-Pass code 4, and settlement uses real aUSDC.</p>
-          <pre class="transcript" id="proto-health-tx">Cleanverse API      reachable
-Monad RPC           reachable
-payer A-Pass        code 4
-payee A-Pass        code 4
-settlement          real aUSDC
-mode                onchain transferFrom</pre>
+          <pre class="transcript" id="proto-health-tx"><span class="tl">Cleanverse API:</span> <span class="ok">reachable</span>
+<span class="tl">Monad RPC:</span> <span class="ok">reachable</span>
+<span class="tl">payer A-Pass:</span> <span class="ok">code 4</span>
+<span class="tl">payee A-Pass:</span> <span class="ok">code 4</span>
+<span class="tl">settlement:</span> <span class="ok">real aUSDC</span>
+<span class="tl">mode:</span> <span class="ok">onchain transferFrom</span></pre>
           <div class="protoactions"><a href="/health" target="_blank">Open health</a><button type="button" data-curl="/health">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -303,9 +310,9 @@ travel rule: official report</pre>
   <section id="how">
     <h2 class="h2 reveal">How Payments Get Cleared or Blocked</h2>
     <div class="grid3">
-      <div class="card reveal"><div class="cl">identity · off-chain</div><h4>Both parties verified</h4><p>Every payment is checked against the live Cleanverse A-Pass registry. No valid A-Pass on either side, no settlement.</p></div>
-      <div class="card reveal"><div class="cl">identity · on-chain</div><h4>Clean funds by construction</h4><p>The A-Token enforces it itself. A transfer to a non-A-Pass wallet reverts on-chain, even outside our facilitator.</p></div>
-      <div class="card reveal"><div class="cl">policy · the mandate</div><h4>Within budget and rules</h4><p>Budget, per-tx cap, min-tier, allowed counterparties, set by the operator and enforced across payments. The budget depletes.</p></div>
+      <div class="card reveal"><h4>Both parties verified</h4><p>Every payment is checked against the live Cleanverse A-Pass registry. No valid A-Pass on either side, no settlement.</p></div>
+      <div class="card reveal"><h4>Clean funds by construction</h4><p>The A-Token enforces it itself. A transfer to a non-A-Pass wallet reverts on-chain, even outside our facilitator.</p></div>
+      <div class="card reveal"><h4>Within budget and rules</h4><p>Budget, per-tx cap, min-tier, allowed counterparties, set by the operator and enforced across payments. The budget depletes.</p></div>
     </div>
   </section>
 
@@ -446,6 +453,9 @@ function reportUrl(tx){return '/report?tx='+tx+'&w='+A;}
 function hydrateReceiptLinks(){const tx=seedTx();const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href=reportUrl(tx);}const pr=$('#proto-report-link');if(pr)pr.href=reportUrl(tx);const pt=$('#proto-tx-link');if(pt)pt.href=EXPLORER+tx;const rr=$('#raw-report-link');if(rr)rr.href=reportUrl(tx);setTranscript('proto-report-tx','CLEARED\ntx: '+tx.slice(0,6)+'...'+tx.slice(-4)+'\noriginator: A-Pass verified\nbeneficiary: A-Pass verified\ntravel rule: official report');}
 function setProto(id,text,cls){const e=$('#'+id);if(e){e.textContent=text;e.className='protostatus '+(cls||'');}}
 function setTranscript(id,text){const e=$('#'+id);if(e)e.textContent=text;}
+function setTranscriptHtml(id,html){const e=$('#'+id);if(e)e.innerHTML=html;}
+function line(label,value,cls){return '<span class="tl">'+label+':</span> <span class="'+(cls||'ok')+'">'+value+'</span>';}
+function statusLine(label,value){return line(label,value,value==='missing'||value==='temporarily unavailable'?'warn':'ok');}
 function verdict(v){return v?'rejected':'missing';}
 function curlFor(path){return 'curl -i '+location.origin+path;}
 async function copyText(text){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text);const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.left='-999px';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}
@@ -454,9 +464,9 @@ document.querySelectorAll('[data-copy-url]').forEach(b=>b.addEventListener('clic
 hydrateReceiptLinks();
 (async function loadProtocolProof(){
   try{const p=await fetchJson('/premium',3,[402]);const req=(p.accepts||[])[0]||{};setProto('proto-402-status','402 challenge live','gd');setTranscript('proto-402-tx','GET /premium\n-> 402 Payment Required\naccepts: '+(req.scheme||'exact')+' · '+(req.network||'eip155:10143')+' · aUSDC\npayTo: '+short(req.payTo||SUP)+'\nresource: premium market-data feed');}catch(e){setProto('proto-402-status','temporarily unavailable','am');}
-  try{const m=await fetchJson('/proof/mandate');const r=m.rejects||{};setProto('proto-mandate-status',m.acceptsValidSignedMandate?'tamper/replay protected':'temporarily unavailable',m.acceptsValidSignedMandate?'gd':'am');setTranscript('proto-mandate-tx','valid mandate       '+(m.acceptsValidSignedMandate?'accepted':'missing')+'\nwrong signer        '+verdict(r.wrongSigner)+'\nexpired mandate     '+verdict(r.expiredMandate)+'\ntampered budget     '+verdict(r.tamperedMandate)+'\nreplayed nonce      '+verdict(r.replayedNonce));}catch(e){setProto('proto-mandate-status','temporarily unavailable','am');}
-  try{const pi=await fetchJson('/proof/payment-intent');const r=pi.rejects||{};setProto('proto-intent-status',pi.acceptsValidIntent?'payer bound to payee/amount/resource':'temporarily unavailable',pi.acceptsValidIntent?'gd':'am');setTranscript('proto-intent-tx','valid intent        '+(pi.acceptsValidIntent?'accepted':'missing')+'\nwrong payee         '+verdict(r.wrongPayee)+'\nwrong amount        '+verdict(r.wrongAmount)+'\nwrong resource      '+verdict(r.wrongResource)+'\nexpired intent      '+verdict(r.expiredIntent)+'\nreplayed nonce      '+verdict(r.replayedNonce));}catch(e){setProto('proto-intent-status','temporarily unavailable','am');}
-  try{const h=await fetchJson('/health');await fetchJson('/supported');const ck=h.checks||{};setProto('proto-health-status',h.status==='ok'?'live infrastructure ok':'live infrastructure degraded',h.status==='ok'?'gd':'am');setTranscript('proto-health-tx','Cleanverse API      '+(ck.cleanverseReachable?'reachable':'temporarily unavailable')+'\nMonad RPC           '+(ck.monadRpcReachable?'reachable':'temporarily unavailable')+'\npayer A-Pass        '+(ck.payerApass?'code '+ck.payerApass.code:'temporarily unavailable')+'\npayee A-Pass        '+(ck.payeeApass?'code '+ck.payeeApass.code:'temporarily unavailable')+'\nsettlement          real aUSDC\nmode                onchain transferFrom');}catch(e){setProto('proto-health-status','temporarily unavailable','am');}
+  try{const m=await fetchJson('/proof/mandate');const r=m.rejects||{};setProto('proto-mandate-status',m.acceptsValidSignedMandate?'tamper/replay protected':'temporarily unavailable',m.acceptsValidSignedMandate?'gd':'am');setTranscriptHtml('proto-mandate-tx',[statusLine('valid mandate',m.acceptsValidSignedMandate?'accepted':'missing'),statusLine('wrong signer',verdict(r.wrongSigner)),statusLine('expired mandate',verdict(r.expiredMandate)),statusLine('tampered budget',verdict(r.tamperedMandate)),statusLine('replayed nonce',verdict(r.replayedNonce))].join('\n'));}catch(e){setProto('proto-mandate-status','temporarily unavailable','am');}
+  try{const pi=await fetchJson('/proof/payment-intent');const r=pi.rejects||{};setProto('proto-intent-status',pi.acceptsValidIntent?'payer bound to payee/amount/resource':'temporarily unavailable',pi.acceptsValidIntent?'gd':'am');setTranscriptHtml('proto-intent-tx',[statusLine('valid intent',pi.acceptsValidIntent?'accepted':'missing'),statusLine('wrong payee',verdict(r.wrongPayee)),statusLine('wrong amount',verdict(r.wrongAmount)),statusLine('wrong resource',verdict(r.wrongResource)),statusLine('expired intent',verdict(r.expiredIntent)),statusLine('replayed nonce',verdict(r.replayedNonce))].join('\n'));}catch(e){setProto('proto-intent-status','temporarily unavailable','am');}
+  try{const h=await fetchJson('/health');await fetchJson('/supported');const ck=h.checks||{};setProto('proto-health-status',h.status==='ok'?'live infrastructure ok':'live infrastructure degraded',h.status==='ok'?'gd':'am');setTranscriptHtml('proto-health-tx',[statusLine('Cleanverse API',ck.cleanverseReachable?'reachable':'temporarily unavailable'),statusLine('Monad RPC',ck.monadRpcReachable?'reachable':'temporarily unavailable'),statusLine('payer A-Pass',ck.payerApass?'code '+ck.payerApass.code:'temporarily unavailable'),statusLine('payee A-Pass',ck.payeeApass?'code '+ck.payeeApass.code:'temporarily unavailable'),statusLine('settlement','real aUSDC'),statusLine('mode','onchain transferFrom')].join('\n'));}catch(e){setProto('proto-health-status','temporarily unavailable','am');}
 })();
 
 async function init(){if(ASSET)return;const r=await fetchJson('/supported');ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
