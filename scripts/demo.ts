@@ -25,7 +25,7 @@ const transport = (path: string, init: RequestInit) => Promise.resolve(fac.app.r
 const payerAccount = privateKeyToAccount(pk('W_PKEY'))
 const A = payerAccount.address
 const supplier = privateKeyToAccount(pk('W2_PKEY')).address
-const DEAD = '0x000000000000000000000000000000000000dEaD' as const
+const NO_APASS = '0x1234567890123456789012345678901234567890' as const
 const usd = (base?: string) => (base ? formatUnits(BigInt(base), 6) + ' aUSDC' : '-')
 
 console.log(`\n${B}cx402 - verified payment intents${X}  ${D}· procurement agent on Monad testnet${X}`)
@@ -37,7 +37,7 @@ await agent.init()
 const steps = [
   { payee: supplier, amount: '0.001', purpose: 'market-data feed' },
   { payee: supplier, amount: '0.001', purpose: 'inference credits' },
-  { payee: DEAD,     amount: '0.001', purpose: 'unknown seller agent' },
+  { payee: NO_APASS,     amount: '0.001', purpose: 'unknown seller agent' },
   { payee: supplier, amount: '0.005', purpose: 'bulk data order' },
   { payee: supplier, amount: '0.001', purpose: 'storage' },
   { payee: supplier, amount: '0.002', purpose: 'more compute' },
@@ -46,7 +46,7 @@ const steps = [
 let i = 0
 for (const s of steps) {
   i++
-  const who = s.payee === DEAD ? `${s.payee.slice(0, 8)}…` : `supplier ${supplier.slice(0, 8)}…`
+  const who = s.payee === NO_APASS ? `${s.payee.slice(0, 8)}…` : `supplier ${supplier.slice(0, 8)}…`
   process.stdout.write(`${D}[${i}]${X} pay ${B}${s.amount} aUSDC${X} → ${who}  ${D}(${s.purpose})${X}\n`)
   const r = await agent.pay({ payee: s.payee, amount: s.amount, purpose: s.purpose })
   if (r.ok) {

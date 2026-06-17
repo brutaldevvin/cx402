@@ -246,7 +246,7 @@ export function createApp(d: Deps): Hono {
 
     const accepted = await new PaymentIntentVerifier().verify(await sign(mk()))
     const wrongResource = await tamper('resource', '/free')
-    const wrongPayee = await tamper('payee', '0x000000000000000000000000000000000000dEaD')
+    const wrongPayee = await tamper('payee', '0x1234567890123456789012345678901234567890')
     const wrongAmount = await tamper('amount', '999999999')
     const expired = await new PaymentIntentVerifier().verify(await sign(mk({ expiresAt: now - 60 })))
     const rv = new PaymentIntentVerifier()

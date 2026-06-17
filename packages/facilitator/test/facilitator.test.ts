@@ -24,7 +24,7 @@ const cfg = loadFacilitatorConfig()
 const ready = cfg.cleanverse.apiId && cfg.cleanverse.appKey && cfg.settlementAsset && cfg.rpcUrl
 const live = ready ? describe : describe.skip
 
-const DEAD = '0x000000000000000000000000000000000000dEaD' as const
+const NO_APASS = '0x1234567890123456789012345678901234567890' as const
 const ERC20 = [{ type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }] }] as const
 
 live('cx402 facilitator (live Monad)', () => {
@@ -60,7 +60,7 @@ live('cx402 facilitator (live Monad)', () => {
   })
 
   it('POST /verify - A -> unverified payee is BLOCKED', async () => {
-    const body = (await (await post('/verify', { payment: payment(DEAD), requirements: requirements(DEAD) })).json()) as { isValid: boolean; compliance: { decision: string; reason: string } }
+    const body = (await (await post('/verify', { payment: payment(NO_APASS), requirements: requirements(NO_APASS) })).json()) as { isValid: boolean; compliance: { decision: string; reason: string } }
     expect(body.isValid).toBe(false)
     expect(body.compliance.decision).toBe('BLOCKED')
     expect(body.compliance.reason).toBe('payee_no_apass')
@@ -99,7 +99,7 @@ live('cx402 facilitator (live Monad)', () => {
   it('POST /settle - A -> unverified payee is BLOCKED, no settlement', async () => {
     const events: EmittedEvent[] = []
     const unsub = bus.subscribe((e) => events.push(e))
-    const res = await post('/settle', { payment: payment(DEAD), requirements: requirements(DEAD) })
+    const res = await post('/settle', { payment: payment(NO_APASS), requirements: requirements(NO_APASS) })
     unsub()
     const body = (await res.json()) as { success: boolean; blocked: boolean; receipt: Receipt }
     expect(res.status).toBe(402)
@@ -159,7 +159,7 @@ live('cx402 policy layer - beyond an identity check (Monad)', () => {
 
   it('identity is checked before policy (unverified payee → blocked by identity)', async () => {
     policyEngine.register(A, { maxPerTx: u('1') })
-    const r = await verify(DEAD, '1000')
+    const r = await verify(NO_APASS, '1000')
     expect(r.compliance.decision).toBe('BLOCKED')
     expect(r.compliance.blockedBy).toBe('identity')
   })

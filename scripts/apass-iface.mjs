@@ -10,7 +10,7 @@ const pc = createPublicClient({ transport: http(env.MONAD_RPC_URL) })
 
 const APASS_HOLDER_A = '0x03681955065AF6EA51660dd63e7634fd0dE4d0a8' // ours, A-Pass'd
 const APASS_HOLDER_X = '0xb169780186349607224267d7aed7ae387b03a8ab' // holds aUSDC -> must have A-Pass
-const NO_APASS       = '0x000000000000000000000000000000000000dEaD' // definitely none
+const NO_APASS       = '0x1234567890123456789012345678901234567890' // known no-A-Pass fixture
 
 // 1) EIP-1967 implementation slot
 const IMPL_SLOT = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
@@ -34,7 +34,7 @@ console.log('\n=== balanceOf (ERC-721-style membership) ===')
 const balAbi = [{name:'balanceOf',type:'function',stateMutability:'view',inputs:[{type:'address'}],outputs:[{type:'uint256'}]}]
 await tryFn('balanceOf(A-Pass holder A)', balAbi, 'balanceOf', [APASS_HOLDER_A])
 await tryFn('balanceOf(A-Pass holder X)', balAbi, 'balanceOf', [APASS_HOLDER_X])
-await tryFn('balanceOf(NO A-Pass dead) ', balAbi, 'balanceOf', [NO_APASS])
+await tryFn('balanceOf(NO A-Pass fixture) ', balAbi, 'balanceOf', [NO_APASS])
 
 console.log('\n=== supportsInterface ===')
 const siAbi = [{name:'supportsInterface',type:'function',stateMutability:'view',inputs:[{type:'bytes4'}],outputs:[{type:'bool'}]}]

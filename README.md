@@ -16,7 +16,7 @@ It is not a wallet, a checkout clone, or a chatbot. It is compliance middleware 
 
 ## Two guardrails
 
-1. **Identity.** Both parties must hold a valid Cleanverse A-Pass. The check runs against the live registry, and the settlement asset enforces it on-chain as well, so a transfer to a non-verified wallet reverts by construction.
+1. **Identity.** Both parties must hold a valid Cleanverse A-Pass. The check runs against the live registry before settlement, so non-verified counterparties are blocked before funds move.
 2. **Policy.** The operator sets a mandate the agent cannot exceed: a spending budget that depletes across payments, a per-payment cap, a minimum counterparty tier, and an optional allow-list. Identity is checked first, then policy.
 
 Anything that fails either guardrail is refused cleanly, with the reason, and never settles. And every attempt, cleared or blocked, emits a signed receipt. A blocked attempt is an auditable record in its own right (who, why, no funds moved), so the refusals prove governance, not just settlement.
@@ -37,7 +37,7 @@ cx402 is built directly on Cleanverse's compliance primitives. Each one maps to 
 | Cleanverse primitive | How cx402 uses it |
 | --- | --- |
 | **A-Pass** | payer and payee identity. Both sides must hold a valid A-Pass before a payment can move. |
-| **aUSDC (Wrapped A-Token)** | the clean settlement asset. An A-Pass-gated stablecoin, so settled funds are compliant by construction. |
+| **aUSDC (Wrapped A-Token)** | the clean settlement asset used after cx402 verifies both parties through Cleanverse A-Pass. |
 | **`verify_apass`** | the pre-settlement compliance gate. Code 4 (valid, transfer allowed) is the only pass. |
 | **`query_apass`** | the privacy-preserving proof fields on the receipt (cvRecordId, KYC hash, tier). No personal data. |
 | **`download_travel_rule`** | the official audit path. Every cleared payment links to a real Cleanverse compliance report (PDF). |

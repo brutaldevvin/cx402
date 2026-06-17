@@ -82,7 +82,7 @@ facilitator the moment you load the site.
 | Primitive | Role in cx402 |
 | --- | --- |
 | **A-Pass** | payer + payee identity; both must be verified to settle |
-| **aUSDC (Wrapped A-Token)** | the clean, A-Pass-gated settlement asset |
+| **aUSDC (Wrapped A-Token)** | the clean settlement asset used for cleared payments after A-Pass verification |
 | **`verify_apass`** | the pre-settlement compliance gate (code 4 = pass) |
 | **`query_apass`** | privacy-preserving receipt proof fields (cvRecordId, KYC hash, tier), no PII |
 | **`download_travel_rule`** | the official audit/report path linked from every cleared receipt |

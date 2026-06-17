@@ -20,7 +20,7 @@ const cfg = loadFacilitatorConfig()
 const ready = cfg.cleanverse.apiId && cfg.cleanverse.appKey && cfg.settlementAsset && cfg.rpcUrl
 const live = ready ? describe : describe.skip
 
-const DEAD = '0x000000000000000000000000000000000000dEaD' as const
+const NO_APASS = '0x1234567890123456789012345678901234567890' as const
 
 live('cx402 Agent SDK - E2E (Monad)', () => {
   const fac = createFacilitator(cfg)
@@ -46,7 +46,7 @@ live('cx402 Agent SDK - E2E (Monad)', () => {
   })
 
   it('refuses an unverified supplier → blocked by identity', async () => {
-    const r = await agent.pay({ payee: DEAD, amount: '0.001', purpose: 'sketchy seller' })
+    const r = await agent.pay({ payee: NO_APASS, amount: '0.001', purpose: 'sketchy seller' })
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.blockedBy).toBe('identity')
   })

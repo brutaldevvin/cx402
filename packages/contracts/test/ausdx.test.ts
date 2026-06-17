@@ -26,7 +26,7 @@ const artifact = JSON.parse(readFileSync(join(root, 'artifacts', 'AUSDx.json'), 
 const abi = artifact.abi
 
 const monad = { id: 10143, name: 'Monad Testnet', nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 }, rpcUrls: { default: { http: [env.MONAD_RPC_URL ?? ''] } } } as const
-const DEAD = '0x000000000000000000000000000000000000dEaD' as const
+const NO_APASS = '0x1234567890123456789012345678901234567890' as const
 
 const ready = token && env.W_PKEY && env.W2_PKEY && env.MONAD_RPC_URL
 const live = ready ? describe : describe.skip
@@ -49,12 +49,12 @@ live('aUSDx - A-Pass-enforcing stand-in token (Monad)', () => {
   })
 
   it('transfer to a NON-A-Pass wallet REVERTS (clean funds by construction)', async () => {
-    const sim = pc.simulateContract({ address: token as `0x${string}`, abi, functionName: 'transfer', args: [DEAD, parseUnits('1', 6)], account: A })
+    const sim = pc.simulateContract({ address: token as `0x${string}`, abi, functionName: 'transfer', args: [NO_APASS, parseUnits('1', 6)], account: A })
     await expect(sim).rejects.toThrow(/NoAPass/i)
   })
 
   it('mint to a NON-A-Pass wallet REVERTS', async () => {
-    const sim = pc.simulateContract({ address: token as `0x${string}`, abi, functionName: 'mint', args: [DEAD, parseUnits('1', 6)], account: A })
+    const sim = pc.simulateContract({ address: token as `0x${string}`, abi, functionName: 'mint', args: [NO_APASS, parseUnits('1', 6)], account: A })
     await expect(sim).rejects.toThrow(/NoAPass/i)
   })
 })

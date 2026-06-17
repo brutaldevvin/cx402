@@ -6,7 +6,7 @@ import { CleanverseClient, loadConfigFromEnv, VerifyCode } from '../src'
 const MONAD = 'monad'
 const AUSDC = '0xaC0893567D43C3E7e6e35a72803df05416C1f20D'
 const WALLET_A = '0x03681955065AF6EA51660dd63e7634fd0dE4d0a8' // our A-Pass'd buyer, tier 20
-const NO_APASS = '0x000000000000000000000000000000000000dEaD' // never registered
+const NO_APASS = '0x1234567890123456789012345678901234567890' // known no-A-Pass fixture
 
 describe('crypto (AES-256-CBC, zero IV)', () => {
   it('round-trips a JSON body', () => {

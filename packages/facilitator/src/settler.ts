@@ -17,9 +17,10 @@ export class SimulatedSettler implements Settler {
 
 /**
  * Live rung: the facilitator submits transferFrom(payer, payee, amount) on the
- * settlement token (aUSDx today, real aUSDC by config). The payer must have
- * approved the facilitator once (onboarding). The token enforces A-Pass on-chain,
- * so this also can't move funds to/from an unverified wallet.
+ * settlement token configured for the deployment. The payer must have approved
+ * the facilitator once (onboarding). cx402's verify_apass gate must clear before
+ * this settler is called; token-level receiver checks are treated as a backstop,
+ * not the primary authorization path.
  */
 export class AusdxSettler implements Settler {
   private readonly wallet

@@ -37,7 +37,7 @@ describe('signed payment intent (per-payment authorization, EIP-191)', () => {
 
   it('rejects a tampered payee (the signature is bound to it)', async () => {
     const s = await signed()
-    s.intent.payee = '0x000000000000000000000000000000000000dEaD'
+    s.intent.payee = '0x1234567890123456789012345678901234567890'
     const r = await new PaymentIntentVerifier().verify(s)
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.reason).toBe('invalid_signature')
