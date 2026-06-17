@@ -398,7 +398,16 @@ export function createApp(d: Deps): Hono {
     if (!tx || !w) return c.json({ error: 'tx and w (wallet) are required' }, 400)
     const r = await d.cv.downloadTravelRule({ txHash: tx, wallet: { chain: d.cfg.chain, address: w } })
     const data = r.data as { downloadUrl?: string } | undefined
-    if (r.code === '0000' && data?.downloadUrl) return c.redirect(data.downloadUrl, 302)
+    if (r.code === '0000' && data?.downloadUrl) {
+      const pdf = await fetch(data.downloadUrl)
+      if (pdf.ok) {
+        const filename = 'cleanverse-report-' + tx.replace(/[^a-zA-Z0-9_-]/g, '') + '.pdf'
+        c.header('content-type', pdf.headers.get('content-type') ?? 'application/pdf')
+        c.header('content-disposition', `inline; filename="${filename}"`)
+        c.header('cache-control', 'no-store')
+        return c.body(await pdf.arrayBuffer())
+      }
+    }
     // a just-settled tx takes a short while for Cleanverse to index before a
     // report can be generated; show a friendly note rather than a raw error
     return c.html(

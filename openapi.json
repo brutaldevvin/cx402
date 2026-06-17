@@ -294,11 +294,19 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Serves the official Cleanverse Travel Rule PDF inline",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
           "202": {
             "description": "Report is still being generated"
-          },
-          "302": {
-            "description": "Redirects to official Cleanverse Travel Rule report"
           },
           "400": {
             "description": "Missing tx or wallet query"
