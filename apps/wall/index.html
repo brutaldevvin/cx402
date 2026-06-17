@@ -60,8 +60,6 @@
   .protostatus{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;line-height:1.35;color:var(--ink);margin-top:12px;text-transform:uppercase;letter-spacing:.08em}
   .protostatus.gd{color:var(--green)}.protostatus.rd{color:#c0392b}.protostatus.am{color:#b8860b}
   .protocard p{font-size:13.5px;color:var(--ink2);line-height:1.45;margin-top:8px;flex:1}
-  .transcript{margin-top:12px;background:#1c1a14;color:#ece7da;border-radius:7px;padding:13px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
-  .transcript .tl{color:#8a8475}.transcript .ok{color:#7fd99b}.transcript .warn{color:#e0b45f}
   .protoactions,.agentlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
   .protoactions a,.protoactions button,.agentlinks a,.agentlinks button{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink);background:var(--paper);border:1px solid var(--edge);border-radius:6px;padding:8px 10px;text-decoration:none;cursor:pointer}
   .protoactions a:hover,.protoactions button:hover,.agentlinks a:hover,.agentlinks button:hover{border-color:var(--green)}
@@ -216,9 +214,9 @@
         <div class="agentready">
           <div class="agenttop"><span>~/cx402/agent</span><span class="ok">agent-ready</span></div>
           <h3>Use cx402 with an agent</h3>
-          <p>Give <span class="mono">/skill.md</span> to Codex, Claude, or another agent so it can verify cx402, discover the payment rail, inspect the 402 challenge, run compliance preflight, and use cx402 to make authorized agent payments.</p>
-          <div class="agentprompt"><span class="mark">$</span><span class="cmd">read /skill.md, verify cx402, inspect /premium, then pay only when authorized</span></div>
-          <div class="agentlinks"><button type="button" data-copy-url="/skill.md">Copy SKILL.md</button><a href="/skill.md" target="_blank">Open /skill.md</a><a href="/llms.txt" target="_blank">Open /llms.txt</a><a href="/openapi.json" target="_blank">Open /openapi.json</a></div>
+          <p>Give Codex, Claude, or another agent one instruction. The hosted skill tells it how to verify cx402, discover the payment rail, inspect the 402 challenge, run compliance preflight, and make authorized agent payments.</p>
+          <div class="agentprompt"><span class="mark">$</span><span class="cmd">Read https://cx402.up.railway.app/skill.md and follow the instructions to use cx402 safely.</span></div>
+          <div class="agentlinks"><button type="button" data-copy-text="Read https://cx402.up.railway.app/skill.md and follow the instructions to verify cx402 and make authorized agent payments.">Copy agent prompt</button><a href="/skill.md" target="_blank">Open /skill.md</a><a href="/llms.txt" target="_blank">Open /llms.txt</a><a href="/openapi.json" target="_blank">Open /openapi.json</a></div>
           <div class="agentcompat"><span>works with</span><b>Codex</b><b>Claude</b><b>other agents</b></div>
         </div>
         <div class="meter"><div class="top"><span>budget</span><span id="bleft">0.004 aUSDC left</span></div><div class="bar"><i id="bbar"></i></div></div>
@@ -242,11 +240,6 @@
           <div class="protoendpoint">/premium</div>
           <div class="protostatus" id="proto-402-status">checking challenge</div>
           <p>This is the seller side. A data API, MCP tool, or agent service can sit behind cx402. If an agent requests the resource without payment, it receives a 402 Payment Required challenge. If it sends a valid compliant payment, the resource is served with a receipt.</p>
-          <pre class="transcript" id="proto-402-tx">GET /premium
--&gt; 402 Payment Required
-accepts: exact · eip155:10143 · aUSDC
-payTo: 0xBe58...CfBB
-resource: premium market-data feed</pre>
           <div class="protoactions"><a href="/premium" target="_blank">Open raw 402 challenge</a><button type="button" data-curl="/premium">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -254,11 +247,6 @@ resource: premium market-data feed</pre>
           <div class="protoendpoint">/proof/mandate</div>
           <div class="protostatus" id="proto-mandate-status">checking mandate proof</div>
           <p>This is the operator side. The human or institution gives the agent a signed spending mandate: budget, max payment, minimum counterparty tier, and optional allow-list. cx402 rejects forged, expired, tampered, or replayed mandates.</p>
-          <pre class="transcript" id="proto-mandate-tx"><span class="tl">valid mandate:</span> <span class="ok">accepted</span>
-<span class="tl">wrong signer:</span> <span class="ok">rejected</span>
-<span class="tl">expired mandate:</span> <span class="ok">rejected</span>
-<span class="tl">tampered budget:</span> <span class="ok">rejected</span>
-<span class="tl">replayed nonce:</span> <span class="ok">rejected</span></pre>
           <div class="protoactions"><a href="/proof/mandate" target="_blank">Open proof</a><button type="button" data-curl="/proof/mandate">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -266,12 +254,6 @@ resource: premium market-data feed</pre>
           <div class="protoendpoint">/proof/payment-intent</div>
           <div class="protostatus" id="proto-intent-status">checking intent proof</div>
           <p>This is the per-payment authorization layer. A payment intent binds the payer to the exact payee, amount, asset, network, resource, nonce, and expiry. If any field changes, the signature breaks.</p>
-          <pre class="transcript" id="proto-intent-tx"><span class="tl">valid intent:</span> <span class="ok">accepted</span>
-<span class="tl">wrong payee:</span> <span class="ok">rejected</span>
-<span class="tl">wrong amount:</span> <span class="ok">rejected</span>
-<span class="tl">wrong resource:</span> <span class="ok">rejected</span>
-<span class="tl">expired intent:</span> <span class="ok">rejected</span>
-<span class="tl">replayed nonce:</span> <span class="ok">rejected</span></pre>
           <div class="protoactions"><a href="/proof/payment-intent" target="_blank">Open proof</a><button type="button" data-curl="/proof/payment-intent">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -279,12 +261,6 @@ resource: premium market-data feed</pre>
           <div class="protoendpoint">/health</div>
           <div class="protostatus" id="proto-health-status">checking infrastructure</div>
           <p>This proves the demo is live: Cleanverse is reachable, Monad is reachable, both parties have valid A-Pass code 4, and settlement uses real aUSDC.</p>
-          <pre class="transcript" id="proto-health-tx"><span class="tl">Cleanverse API:</span> <span class="ok">reachable</span>
-<span class="tl">Monad RPC:</span> <span class="ok">reachable</span>
-<span class="tl">payer A-Pass:</span> <span class="ok">code 4</span>
-<span class="tl">payee A-Pass:</span> <span class="ok">code 4</span>
-<span class="tl">settlement:</span> <span class="ok">real aUSDC</span>
-<span class="tl">mode:</span> <span class="ok">onchain transferFrom</span></pre>
           <div class="protoactions"><a href="/health" target="_blank">Open health</a><button type="button" data-curl="/health">Copy curl</button></div>
         </article>
         <article class="protocard">
@@ -292,11 +268,6 @@ resource: premium market-data feed</pre>
           <div class="protoendpoint">/report</div>
           <div class="protostatus gd">audit trail available</div>
           <p>This is the audit output. A cleared payment gets a signed receipt, Monad transaction hash, privacy-preserving A-Pass proof fields, and a Cleanverse Travel Rule report.</p>
-          <pre class="transcript" id="proto-report-tx">CLEARED
-tx: 0xddaa...fc36
-originator: A-Pass verified
-beneficiary: A-Pass verified
-travel rule: official report</pre>
           <div class="protoactions"><a id="proto-report-link" href="/report" target="_blank">Open report</a><a id="proto-tx-link" href="#" target="_blank">Open transaction</a></div>
         </article>
       </div>
@@ -450,23 +421,18 @@ fetchJson('/health').then(h=>{$('#livestatus').innerHTML=h.status==='ok'?'<span 
 
 function seedTx(){return (SEED.find(function(s){return s.tx;})||{}).tx||PROOFTX;}
 function reportUrl(tx){return '/report?tx='+tx+'&w='+A;}
-function hydrateReceiptLinks(){const tx=seedTx();const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href=reportUrl(tx);}const pr=$('#proto-report-link');if(pr)pr.href=reportUrl(tx);const pt=$('#proto-tx-link');if(pt)pt.href=EXPLORER+tx;const rr=$('#raw-report-link');if(rr)rr.href=reportUrl(tx);setTranscript('proto-report-tx','CLEARED\ntx: '+tx.slice(0,6)+'...'+tx.slice(-4)+'\noriginator: A-Pass verified\nbeneficiary: A-Pass verified\ntravel rule: official report');}
+function hydrateReceiptLinks(){const tx=seedTx();const ht=$('#h-tx');if(ht){ht.textContent='latest tx ↗';ht.href=EXPLORER+tx;}const hr=$('#h-report');if(hr){hr.textContent='travel rule report ↗';hr.href=reportUrl(tx);}const pr=$('#proto-report-link');if(pr)pr.href=reportUrl(tx);const pt=$('#proto-tx-link');if(pt)pt.href=EXPLORER+tx;const rr=$('#raw-report-link');if(rr)rr.href=reportUrl(tx);}
 function setProto(id,text,cls){const e=$('#'+id);if(e){e.textContent=text;e.className='protostatus '+(cls||'');}}
-function setTranscript(id,text){const e=$('#'+id);if(e)e.textContent=text;}
-function setTranscriptHtml(id,html){const e=$('#'+id);if(e)e.innerHTML=html;}
-function line(label,value,cls){return '<span class="tl">'+label+':</span> <span class="'+(cls||'ok')+'">'+value+'</span>';}
-function statusLine(label,value){return line(label,value,value==='missing'||value==='temporarily unavailable'?'warn':'ok');}
-function verdict(v){return v?'rejected':'missing';}
 function curlFor(path){return 'curl -i '+location.origin+path;}
 async function copyText(text){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text);const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.left='-999px';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}
 document.querySelectorAll('[data-curl]').forEach(b=>b.addEventListener('click',async()=>{const old=b.textContent;try{await copyText(curlFor(b.dataset.curl));b.textContent='Copied';setTimeout(()=>b.textContent=old,1200)}catch(e){b.textContent='Copy failed';setTimeout(()=>b.textContent=old,1400)}}));
-document.querySelectorAll('[data-copy-url]').forEach(b=>b.addEventListener('click',async()=>{const old=b.textContent;try{const text=await fetchText(b.dataset.copyUrl);await copyText(text);b.textContent='Copied';setTimeout(()=>b.textContent=old,1200)}catch(e){b.textContent='Copy failed';setTimeout(()=>b.textContent=old,1400)}}));
+document.querySelectorAll('[data-copy-text],[data-copy-url]').forEach(b=>b.addEventListener('click',async()=>{const old=b.textContent;try{const text=b.dataset.copyText||await fetchText(b.dataset.copyUrl);await copyText(text);b.textContent='Copied';setTimeout(()=>b.textContent=old,1200)}catch(e){b.textContent='Copy failed';setTimeout(()=>b.textContent=old,1400)}}));
 hydrateReceiptLinks();
 (async function loadProtocolProof(){
-  try{const p=await fetchJson('/premium',3,[402]);const req=(p.accepts||[])[0]||{};setProto('proto-402-status','402 challenge live','gd');setTranscript('proto-402-tx','GET /premium\n-> 402 Payment Required\naccepts: '+(req.scheme||'exact')+' · '+(req.network||'eip155:10143')+' · aUSDC\npayTo: '+short(req.payTo||SUP)+'\nresource: premium market-data feed');}catch(e){setProto('proto-402-status','temporarily unavailable','am');}
-  try{const m=await fetchJson('/proof/mandate');const r=m.rejects||{};setProto('proto-mandate-status',m.acceptsValidSignedMandate?'tamper/replay protected':'temporarily unavailable',m.acceptsValidSignedMandate?'gd':'am');setTranscriptHtml('proto-mandate-tx',[statusLine('valid mandate',m.acceptsValidSignedMandate?'accepted':'missing'),statusLine('wrong signer',verdict(r.wrongSigner)),statusLine('expired mandate',verdict(r.expiredMandate)),statusLine('tampered budget',verdict(r.tamperedMandate)),statusLine('replayed nonce',verdict(r.replayedNonce))].join('\n'));}catch(e){setProto('proto-mandate-status','temporarily unavailable','am');}
-  try{const pi=await fetchJson('/proof/payment-intent');const r=pi.rejects||{};setProto('proto-intent-status',pi.acceptsValidIntent?'payer bound to payee/amount/resource':'temporarily unavailable',pi.acceptsValidIntent?'gd':'am');setTranscriptHtml('proto-intent-tx',[statusLine('valid intent',pi.acceptsValidIntent?'accepted':'missing'),statusLine('wrong payee',verdict(r.wrongPayee)),statusLine('wrong amount',verdict(r.wrongAmount)),statusLine('wrong resource',verdict(r.wrongResource)),statusLine('expired intent',verdict(r.expiredIntent)),statusLine('replayed nonce',verdict(r.replayedNonce))].join('\n'));}catch(e){setProto('proto-intent-status','temporarily unavailable','am');}
-  try{const h=await fetchJson('/health');await fetchJson('/supported');const ck=h.checks||{};setProto('proto-health-status',h.status==='ok'?'live infrastructure ok':'live infrastructure degraded',h.status==='ok'?'gd':'am');setTranscriptHtml('proto-health-tx',[statusLine('Cleanverse API',ck.cleanverseReachable?'reachable':'temporarily unavailable'),statusLine('Monad RPC',ck.monadRpcReachable?'reachable':'temporarily unavailable'),statusLine('payer A-Pass',ck.payerApass?'code '+ck.payerApass.code:'temporarily unavailable'),statusLine('payee A-Pass',ck.payeeApass?'code '+ck.payeeApass.code:'temporarily unavailable'),statusLine('settlement','real aUSDC'),statusLine('mode','onchain transferFrom')].join('\n'));}catch(e){setProto('proto-health-status','temporarily unavailable','am');}
+  try{await fetchJson('/premium',3,[402]);setProto('proto-402-status','402 challenge live','gd');}catch(e){setProto('proto-402-status','temporarily unavailable','am');}
+  try{const m=await fetchJson('/proof/mandate');setProto('proto-mandate-status',m.acceptsValidSignedMandate?'tamper/replay protected':'temporarily unavailable',m.acceptsValidSignedMandate?'gd':'am');}catch(e){setProto('proto-mandate-status','temporarily unavailable','am');}
+  try{const pi=await fetchJson('/proof/payment-intent');setProto('proto-intent-status',pi.acceptsValidIntent?'payer bound to payee/amount/resource':'temporarily unavailable',pi.acceptsValidIntent?'gd':'am');}catch(e){setProto('proto-intent-status','temporarily unavailable','am');}
+  try{const h=await fetchJson('/health');await fetchJson('/supported');setProto('proto-health-status',h.status==='ok'?'live infrastructure ok':'live infrastructure degraded',h.status==='ok'?'gd':'am');}catch(e){setProto('proto-health-status','temporarily unavailable','am');}
 })();
 
 async function init(){if(ASSET)return;const r=await fetchJson('/supported');ASSET=r.kinds[0].asset;NETWORK=r.kinds[0].network;}
